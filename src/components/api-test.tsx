@@ -60,7 +60,7 @@ export function APITest() {
             }
 
             // Check for error in response body or non-OK status
-            if (!res.ok || body.error || body.message) {
+            if (!res.ok || body.error) {
                 const errorMsg = (body.error || body.message || res.statusText) as string
                 setApiResponse(errorMsg)
                 setApiSuccess(false)

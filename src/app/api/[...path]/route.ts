@@ -57,7 +57,7 @@ async function handler(request: NextRequest, { params }: { params: Promise<{ pat
     const { token } = await auth.api.getToken({
       headers: await headers(),
     })
-    
+
     // Inject the JWT as a Bearer token
     rheaders.set("Authorization", `Bearer ${token}`)
 
@@ -96,4 +96,3 @@ export const PUT = handler
 export const DELETE = handler
 export const PATCH = handler
 export const HEAD = handler
-export const OPTIONS = handler

@@ -116,12 +116,22 @@ class ApiClient {
     try {
       const token = await this.getToken()
 
-      // Send the request with the JWT in the Authorization header
+      // Build headers: merge defaults, auth, and caller-supplied headers
+      const mergedHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+      }
+
+      // Only inject Authorization if we have a valid token
+      if (token) {
+        mergedHeaders["Authorization"] = `Bearer ${token}`
+      }
+
+      // Send the request, preserving any caller-supplied headers
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          ...mergedHeaders,
+          ...(options.headers as Record<string, string>),
         },
       })
 
