@@ -21,10 +21,14 @@ export default function SignUpPage() {
     setError("")
 
     try {
-      await authClient.signUp.email({ email, password, name })
+      const result = await authClient.signUp.email({ email, password, name })
+      if (result.error) {
+        setError(result.error.message || "Failed to create account. Please try again.")
+        return
+      }
       window.location.href = "/login"
     } catch {
-      setError("Failed to create account. Please try again.")
+      setError("An unexpected error occurred. Please try again.")
     } finally {
       setLoading(false)
     }

@@ -54,20 +54,38 @@ async function handler(request: NextRequest, { params }: { params: Promise<{ pat
 
   try {
     // Get a JWT from better-auth for the current session
-    const { token } = await auth.api.getToken({
-      headers: await headers(),
-    })
+    let token: string
+    try {
+      const result = await auth.api.getToken({
+        headers: await headers(),
+      })
+      if (!result?.token) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        )
+      }
+      token = result.token
+    } catch {
+      return NextResponse.json(
+        { error: 'Authentication required — please sign in' },
+        { status: 401 }
+      )
+    }
 
     // Inject the JWT as a Bearer token
     rheaders.set("Authorization", `Bearer ${token}`)
 
-    // Forward the request to the backend
-    const response = await fetch(url.toString(), {
+    // Build fetch options — omit body for GET/HEAD (throws in strict runtimes)
+    const isBodyless = request.method === 'GET' || request.method === 'HEAD'
+    const fetchOptions: RequestInit = {
       method: request.method,
       headers: rheaders,
-      body: request.body,
-      duplex: 'half',
-    } as RequestInit)
+      ...(isBodyless ? {} : { body: request.body, duplex: 'half' }),
+    }
+
+    // Forward the request to the backend
+    const response = await fetch(url.toString(), fetchOptions)
 
     // Clean up response headers that could conflict with Next.js streaming
     const responseHeaders = new Headers(response.headers)

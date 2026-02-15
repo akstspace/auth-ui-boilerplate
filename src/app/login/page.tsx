@@ -22,20 +22,28 @@ export default function LoginPage() {
     setError("")
 
     try {
-      await authClient.signIn.email({ email, password })
+      const result = await authClient.signIn.email({ email, password })
+      if (result.error) {
+        setError(result.error.message || "Invalid email or password. Please try again.")
+        return
+      }
       router.push("/")
     } catch {
-      setError("Invalid email or password. Please try again.")
+      setError("An unexpected error occurred. Please try again.")
     } finally {
       setLoading(false)
     }
   }
 
   const handleGoogleSignIn = async () => {
+    setError("")
     try {
-      await authClient.signIn.social({ provider: "google" })
+      const result = await authClient.signIn.social({ provider: "google" })
+      if (result.error) {
+        setError(result.error.message || "Google sign in failed. Please try again.")
+      }
     } catch {
-      setError("Google sign in failed. Please try again.")
+      setError("An unexpected error occurred. Please try again.")
     }
   }
 
