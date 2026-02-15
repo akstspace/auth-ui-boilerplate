@@ -159,9 +159,10 @@ const customizePrompt = `I cloned the auth-ui-boilerplate. Strip all demo/boiler
 2. Replace the homepage (src/app/page.tsx):
    - Remove all demo content (How It Works, Backend Integration guide, Security Best Practices, Environment Variables, Project Structure, Credits sections)
    - Keep the nav bar with the app name and theme toggle (remove the Lock icon and GitHub link)
-   - Remove all links from the footer (keep the footer container)
+   - Remove all links from the footer (and remove the footer container as well)
    - Wrap the page with the LoginRequired component from src/components/login-required.tsx so unauthenticated users are redirected to /login
    - Add a simple welcome/dashboard layout that shows the authenticated user's name and a sign-out button (use authClient.useSession() from @/lib/auth-client)
+   - Make Sign Out button part of Navbar instead of the page content.
 
 3. Remove the Back button from Login & Signup pages:
    - Remove the "Back" link and ArrowLeft icon from src/app/login/page.tsx
