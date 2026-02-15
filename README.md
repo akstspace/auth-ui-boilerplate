@@ -127,34 +127,40 @@ After cloning, give this prompt to your AI coding assistant (Cursor, Copilot, Cl
 ```
 I cloned the auth-ui-boilerplate. Strip all demo/boilerplate UI and turn this into a clean starting point for my app. Specifically:
 
-1. **Remove demo components:**
-   - Delete `src/components/auth-status.tsx` (auth status card)
-   - Delete `src/components/api-test.tsx` and `src/components/api-test-axios.tsx` (API test cards)
+1. Remove demo components:
+   - Delete src/components/auth-status.tsx (auth status card)
+   - Delete src/components/api-test.tsx and src/components/api-test-axios.tsx (API test cards)
 
-2. **Replace the homepage (`src/app/page.tsx`):**
+2. Replace the homepage (src/app/page.tsx):
    - Remove all demo content (How It Works, Backend Integration guide, Security Best Practices, Environment Variables, Project Structure, Credits sections)
-   - Keep the nav bar with the app name, GitHub link, and theme toggle
-   - Keep the footer
-   - Add a simple welcome/dashboard layout that shows the authenticated user's name and a sign-out button (use `authClient.useSession()` from `@/lib/auth-client`)
+   - Keep the nav bar with the app name and theme toggle (remove the Lock icon and GitHub link)
+   - Remove all links from the footer (keep the footer container)
+   - Wrap the page with the LoginRequired component from src/components/login-required.tsx so unauthenticated users are redirected to /login
+   - Add a simple welcome/dashboard layout that shows the authenticated user's name and a sign-out button (use authClient.useSession() from @/lib/auth-client)
 
-3. **Keep these files as-is (core infrastructure):**
-   - `src/lib/auth.ts` and `src/lib/auth-client.ts` (Better Auth config)
-   - `src/lib/api-client.ts` and `src/lib/api-client-axios.ts` (API clients with JWT injection)
-   - `src/app/api/auth/[...all]/route.ts` (auth API handler)
-   - `src/app/api/[...path]/route.ts` (JWT-injecting API proxy)
-   - `src/app/login/page.tsx` and `src/app/signup/page.tsx` (auth pages)
-   - `src/db/` (Drizzle schema and migrations)
-   - `src/components/ui/` (shadcn/ui primitives)
-   - `src/components/theme-provider.tsx` and `src/components/theme-toggle.tsx`
-   - `src/components/fade-in.tsx`
+3. Remove the Back button from Login & Signup pages:
+   - Remove the "Back" link and ArrowLeft icon from src/app/login/page.tsx
+   - Remove the "Back" link and ArrowLeft icon from src/app/signup/page.tsx
 
-4. **Update the app name:**
+4. Keep these files as-is (core infrastructure):
+   - src/lib/auth.ts and src/lib/auth-client.ts (Better Auth config)
+   - src/lib/api-client.ts and src/lib/api-client-axios.ts (API clients with JWT injection)
+   - src/app/api/auth/[...all]/route.ts (auth API handler)
+   - src/app/api/[...path]/route.ts (JWT-injecting API proxy)
+   - src/app/login/page.tsx and src/app/signup/page.tsx (auth pages — except the Back button removal above)
+   - src/db/ (Drizzle schema and migrations)
+   - src/components/ui/ (shadcn/ui primitives)
+   - src/components/theme-provider.tsx and src/components/theme-toggle.tsx
+   - src/components/fade-in.tsx
+   - src/components/login-required.tsx
+
+5. Update the app name:
    - Ask me what my app name is before making any changes
-   - Then replace "Auth UI Boilerplate" with my app name in the nav, footer, and `src/app/layout.tsx` metadata
+   - Then replace "Auth UI Boilerplate" with my app name in the nav, footer, and src/app/layout.tsx metadata
 
-5. **Clean up unused imports** after removing components.
+6. Clean up unused imports after removing components.
 
-The result should compile with `npm run build` and show a minimal authenticated dashboard.
+The result should compile with npm run build and show a minimal authenticated dashboard.
 ```
 
 </details>
