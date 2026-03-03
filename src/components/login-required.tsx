@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import authClient from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client"
 
 /**
  * Wraps a page so that unauthenticated users are redirected to /login.

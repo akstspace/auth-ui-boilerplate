@@ -48,6 +48,16 @@ See [`.env.example`](.env.example) for all required variables:
 | `BACKEND_API_URL` | Server | Backend URL (for API proxy) |
 | `NEXT_PUBLIC_BACKEND_API_URL` | Client | Backend URL (for browser clients) |
 
+## Email Testing with Mailpit
+
+For testing email features locally, start Mailpit (a local SMTP server and web UI):
+
+```bash
+/usr/local/bin/mailpit -d /tmp/mailpit.db
+```
+
+This starts Mailpit with a persistent database. Access the web UI at `http://localhost:8025` to view all emails sent during development.
+
 ## Backend Integration
 
 This boilerplate issues **JWTs verified via JWKS** — no shared secrets needed. Your backend fetches public keys from:
@@ -137,7 +147,7 @@ I cloned the auth-ui-boilerplate. Strip all demo/boilerplate UI and turn this in
    - Remove all links from the footer (and remove the footer container as well)
    - Wrap the page with the LoginRequired component from src/components/login-required.tsx so unauthenticated users are redirected to /login
    - Add a simple welcome/dashboard layout that shows the authenticated user's name and a sign-out button (use authClient.useSession() from @/lib/auth-client)
-   - Make Sign Out button part of Navbar instead of the page content.
+   - Make Sign Out button and the organization switcher (<OrgSwitcher /> from @/components/org-switcher) part of the Navbar.
 
 3. Remove the Back button from Login & Signup pages:
    - Remove the "Back" link and ArrowLeft icon from src/app/login/page.tsx
@@ -146,14 +156,18 @@ I cloned the auth-ui-boilerplate. Strip all demo/boilerplate UI and turn this in
 4. Keep these files as-is (core infrastructure):
    - src/lib/auth.ts and src/lib/auth-client.ts (Better Auth config)
    - src/lib/api-client.ts and src/lib/api-client-axios.ts (API clients with JWT injection)
+   - src/lib/email.ts (email utility)
    - src/app/api/auth/[...all]/route.ts (auth API handler)
    - src/app/api/[...path]/route.ts (JWT-injecting API proxy)
    - src/app/login/page.tsx and src/app/signup/page.tsx (auth pages — except the Back button removal above)
+   - src/app/accept-invitation/, src/app/onboarding/, and src/app/org/ (organization and onboarding flows)
    - src/db/ (Drizzle schema and migrations)
    - src/components/ui/ (shadcn/ui primitives)
    - src/components/theme-provider.tsx and src/components/theme-toggle.tsx
    - src/components/fade-in.tsx
    - src/components/login-required.tsx
+   - src/components/org-switcher.tsx
+   - src/app/icon.svg
 
 5. Update the app name:
    - Ask me what my app name is before making any changes

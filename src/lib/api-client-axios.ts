@@ -21,7 +21,7 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from "axios"
-import authClient from "./auth-client"
+import { authClient } from "./auth-client"
 
 /** The base URL for your backend API service */
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8080"

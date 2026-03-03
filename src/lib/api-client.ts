@@ -21,7 +21,7 @@
  * - In production, always use HTTPS for both the auth server and the backend.
  */
 
-import authClient from "./auth-client"
+import { authClient } from "./auth-client"
 import { decodeJwt } from "jose"
 
 /** The base URL for your backend API service */
