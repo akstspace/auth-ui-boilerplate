@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion } from "motion/react"
 import { Shield, Key, Clock, Tag, Copy, Check, Lock, Fingerprint, Database, Globe, Terminal, FolderTree, Blocks, Sparkles } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { FadeIn } from "@/components/fade-in"
+
 import Link from "next/link"
 
 // ---------------------------------------------------------------------------
@@ -348,74 +348,74 @@ export default function GuidePage() {
 
                 {/* ── Quick Start ─────────────────────────────────────────── */}
                 <section className="mb-16">
-                    <FadeIn>
-                        <div className="flex items-center gap-2.5 mb-6">
-                            <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
-                                <Terminal className="size-4 text-foreground" />
-                            </div>
-                            <h2 className="text-xl font-bold text-foreground text-balance">Quick Start (Dev Container)</h2>
-                        </div>
-                    </FadeIn>
 
-                    <FadeIn delay={0.05}>
-                        <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 space-y-5">
-                            <p className="text-sm text-muted-foreground text-pretty">
-                                Requires <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer" className="text-foreground underline underline-offset-2 hover:no-underline">VS Code</a> + <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers" target="_blank" rel="noopener noreferrer" className="text-foreground underline underline-offset-2 hover:no-underline">Dev Containers extension</a> + Docker.
+                    <div className="flex items-center gap-2.5 mb-6">
+                        <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
+                            <Terminal className="size-4 text-foreground" />
+                        </div>
+                        <h2 className="text-xl font-bold text-foreground text-balance">Quick Start (Dev Container)</h2>
+                    </div>
+
+
+
+                    <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 space-y-5">
+                        <p className="text-sm text-muted-foreground text-pretty">
+                            Requires <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer" className="text-foreground underline underline-offset-2 hover:no-underline">VS Code</a> + <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers" target="_blank" rel="noopener noreferrer" className="text-foreground underline underline-offset-2 hover:no-underline">Dev Containers extension</a> + Docker.
+                        </p>
+
+                        <div className="space-y-4">
+                            <div className="flex gap-3">
+                                <span className="flex-shrink-0 flex items-center justify-center size-6 rounded-full bg-muted text-xs font-bold tabular-nums text-foreground">1</span>
+                                <div>
+                                    <p className="text-sm font-medium text-foreground">Open in Dev Container</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5 text-pretty">Open this repo in VS Code, then <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs border border-border/50">Cmd+Shift+P</kbd> → &ldquo;Dev Containers: Reopen in Container&rdquo;.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <span className="flex-shrink-0 flex items-center justify-center size-6 rounded-full bg-muted text-xs font-bold tabular-nums text-foreground">2</span>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-foreground">Install prerequisites</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5 text-pretty mb-2">Inside the container, set up Node.js and Python.</p>
+                                    <CodeBlock code={`volta install node\npyenv install 3.12\npyenv global 3.12`} />
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <span className="flex-shrink-0 flex items-center justify-center size-6 rounded-full bg-muted text-xs font-bold tabular-nums text-foreground">3</span>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-foreground">Configure environment</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5 text-pretty mb-2">Copy and edit the example env file. Update Google OAuth credentials.</p>
+                                    <CodeBlock code="cp .env.example .env" />
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <span className="flex-shrink-0 flex items-center justify-center size-6 rounded-full bg-muted text-xs font-bold tabular-nums text-foreground">4</span>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-foreground">Install & run</p>
+                                    <CodeBlock code={`npm install\nnpm run db:push    # Push schema to Postgres\nnpm run dev        # Start dev server on :3000`} />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="border-t border-border/40 pt-4">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Manual Setup (No Dev Container)</p>
+                            <p className="text-xs text-muted-foreground text-pretty">
+                                Have Node.js 22+ and PostgreSQL running locally. Then: <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">cp .env.example .env</code> → update <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">DATABASE_URL</code> → <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">npm install && npm run db:push && npm run dev</code>
                             </p>
-
-                            <div className="space-y-4">
-                                <div className="flex gap-3">
-                                    <span className="flex-shrink-0 flex items-center justify-center size-6 rounded-full bg-muted text-xs font-bold tabular-nums text-foreground">1</span>
-                                    <div>
-                                        <p className="text-sm font-medium text-foreground">Open in Dev Container</p>
-                                        <p className="text-xs text-muted-foreground mt-0.5 text-pretty">Open this repo in VS Code, then <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs border border-border/50">Cmd+Shift+P</kbd> → &ldquo;Dev Containers: Reopen in Container&rdquo;.</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-3">
-                                    <span className="flex-shrink-0 flex items-center justify-center size-6 rounded-full bg-muted text-xs font-bold tabular-nums text-foreground">2</span>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-foreground">Install prerequisites</p>
-                                        <p className="text-xs text-muted-foreground mt-0.5 text-pretty mb-2">Inside the container, set up Node.js and Python.</p>
-                                        <CodeBlock code={`volta install node\npyenv install 3.12\npyenv global 3.12`} />
-                                    </div>
-                                </div>
-                                <div className="flex gap-3">
-                                    <span className="flex-shrink-0 flex items-center justify-center size-6 rounded-full bg-muted text-xs font-bold tabular-nums text-foreground">3</span>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-foreground">Configure environment</p>
-                                        <p className="text-xs text-muted-foreground mt-0.5 text-pretty mb-2">Copy and edit the example env file. Update Google OAuth credentials.</p>
-                                        <CodeBlock code="cp .env.example .env" />
-                                    </div>
-                                </div>
-                                <div className="flex gap-3">
-                                    <span className="flex-shrink-0 flex items-center justify-center size-6 rounded-full bg-muted text-xs font-bold tabular-nums text-foreground">4</span>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-foreground">Install & run</p>
-                                        <CodeBlock code={`npm install\nnpm run db:push    # Push schema to Postgres\nnpm run dev        # Start dev server on :3000`} />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="border-t border-border/40 pt-4">
-                                <p className="text-xs font-medium text-muted-foreground mb-2">Manual Setup (No Dev Container)</p>
-                                <p className="text-xs text-muted-foreground text-pretty">
-                                    Have Node.js 22+ and PostgreSQL running locally. Then: <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">cp .env.example .env</code> → update <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">DATABASE_URL</code> → <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">npm install && npm run db:push && npm run dev</code>
-                                </p>
-                            </div>
                         </div>
-                    </FadeIn>
+                    </div>
+
                 </section>
 
                 {/* ── How It Works ────────────────────────────────────────── */}
                 <section className="mb-16">
-                    <FadeIn>
-                        <div className="flex items-center gap-2.5 mb-6">
-                            <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
-                                <Fingerprint className="size-4 text-foreground" />
-                            </div>
-                            <h2 className="text-xl font-bold text-foreground text-balance">How It Works</h2>
+
+                    <div className="flex items-center gap-2.5 mb-6">
+                        <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
+                            <Fingerprint className="size-4 text-foreground" />
                         </div>
-                    </FadeIn>
+                        <h2 className="text-xl font-bold text-foreground text-balance">How It Works</h2>
+                    </div>
+
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
@@ -423,98 +423,96 @@ export default function GuidePage() {
                             { n: 2, icon: Key, title: "JWT issued", desc: "Short-lived token from /api/auth/token" },
                             { n: 3, icon: Globe, title: "Sent to backend", desc: "Authorization: Bearer header on API calls" },
                             { n: 4, icon: Shield, title: "Backend verifies", desc: "Validated via JWKS public key endpoint" },
-                        ].map((step, i) => (
-                            <FadeIn key={step.n} delay={i * 0.1}>
-                                <div className="group relative h-full rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-5 hover:-translate-y-0.5 transition-transform duration-200">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="flex items-center justify-center size-9 rounded-lg bg-muted">
-                                            <step.icon className="size-4 text-foreground" />
-                                        </div>
-                                        <span className="text-xs font-mono text-muted-foreground tabular-nums">0{step.n}</span>
+                        ].map((step) => (
+                            <div key={step.n} className="group relative h-full rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-5 hover:-translate-y-0.5 transition-transform duration-200">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="flex items-center justify-center size-9 rounded-lg bg-muted">
+                                        <step.icon className="size-4 text-foreground" />
                                     </div>
-                                    <h3 className="font-medium text-foreground text-sm mb-1">{step.title}</h3>
-                                    <p className="text-muted-foreground text-xs leading-relaxed text-pretty">{step.desc}</p>
+                                    <span className="text-xs font-mono text-muted-foreground tabular-nums">0{step.n}</span>
                                 </div>
-                            </FadeIn>
+                                <h3 className="font-medium text-foreground text-sm mb-1">{step.title}</h3>
+                                <p className="text-muted-foreground text-xs leading-relaxed text-pretty">{step.desc}</p>
+                            </div>
                         ))}
                     </div>
                 </section>
 
                 {/* ── Backend Integration ──────────────────────────────────── */}
                 <section id="integration" className="mb-16 scroll-mt-20">
-                    <FadeIn>
-                        <div className="flex items-center gap-2.5 mb-2">
-                            <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
-                                <Blocks className="size-4 text-foreground" />
-                            </div>
-                            <h2 className="text-xl font-bold text-foreground text-balance">Backend Integration</h2>
+
+                    <div className="flex items-center gap-2.5 mb-2">
+                        <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
+                            <Blocks className="size-4 text-foreground" />
                         </div>
-                        <p className="text-sm text-muted-foreground mb-6 ml-[42px] text-pretty">
-                            This boilerplate issues JWTs verified via JWKS — no shared secrets needed. Your backend fetches public keys from <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{"BETTER_AUTH_URL"}/api/auth/jwks</code>.
-                        </p>
-                    </FadeIn>
+                        <h2 className="text-xl font-bold text-foreground text-balance">Backend Integration</h2>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-6 ml-[42px] text-pretty">
+                        This boilerplate issues JWTs verified via JWKS — no shared secrets needed. Your backend fetches public keys from <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{"BETTER_AUTH_URL"}/api/auth/jwks</code>.
+                    </p>
 
-                    <FadeIn delay={0.1}>
-                        <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
-                            {/* Tab bar */}
-                            <div className="flex items-center gap-1 border-b border-border/50 px-4 pt-3" role="tablist">
-                                {tabs.map((tab) => (
-                                    <button
-                                        key={tab.id}
-                                        id={`tab-${tab.id}`}
-                                        role="tab"
-                                        aria-selected={activeTab === tab.id}
-                                        aria-controls={`panel-${tab.id}`}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-t-lg ${activeTab === tab.id
-                                            ? "text-foreground"
-                                            : "text-muted-foreground hover:text-foreground"
-                                            }`}
-                                    >
-                                        {tab.label}
-                                        {activeTab === tab.id && (
-                                            <motion.div
-                                                layoutId="activeTab"
-                                                className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"
-                                                transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                                            />
-                                        )}
-                                    </button>
-                                ))}
-                                <div className="ml-auto pb-2">
-                                    <CopyButton text={current.code} />
-                                </div>
-                            </div>
 
-                            {/* Dependencies */}
-                            <div className="border-b border-border/30 bg-muted/20 px-5 py-3">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                    <Database className="size-3.5 text-muted-foreground" />
-                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Dependencies</span>
-                                </div>
-                                <pre className="text-sm text-foreground font-mono"><code>{current.deps}</code></pre>
-                            </div>
 
-                            {/* Code with syntax highlighting */}
-                            <div id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`} className="max-h-[480px] overflow-y-auto">
-                                <pre className="p-5 text-sm font-mono leading-relaxed">
-                                    <code>{highlightCode(current.code, current.lang)}</code>
-                                </pre>
+                    <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
+                        {/* Tab bar */}
+                        <div className="flex items-center gap-1 border-b border-border/50 px-4 pt-3" role="tablist">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    id={`tab-${tab.id}`}
+                                    role="tab"
+                                    aria-selected={activeTab === tab.id}
+                                    aria-controls={`panel-${tab.id}`}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-t-lg ${activeTab === tab.id
+                                        ? "text-foreground"
+                                        : "text-muted-foreground hover:text-foreground"
+                                        }`}
+                                >
+                                    {tab.label}
+                                    {activeTab === tab.id && (
+                                        <motion.div
+                                            layoutId="activeTab"
+                                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"
+                                            transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                                        />
+                                    )}
+                                </button>
+                            ))}
+                            <div className="ml-auto pb-2">
+                                <CopyButton text={current.code} />
                             </div>
                         </div>
-                    </FadeIn>
+
+                        {/* Dependencies */}
+                        <div className="border-b border-border/30 bg-muted/20 px-5 py-3">
+                            <div className="flex items-center gap-2 mb-1.5">
+                                <Database className="size-3.5 text-muted-foreground" />
+                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Dependencies</span>
+                            </div>
+                            <pre className="text-sm text-foreground font-mono"><code>{current.deps}</code></pre>
+                        </div>
+
+                        {/* Code with syntax highlighting */}
+                        <div id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`} className="max-h-[480px] overflow-y-auto">
+                            <pre className="p-5 text-sm font-mono leading-relaxed">
+                                <code>{highlightCode(current.code, current.lang)}</code>
+                            </pre>
+                        </div>
+                    </div>
+
                 </section>
 
                 {/* ── Security Best Practices ─────────────────────────────── */}
                 <section className="mb-16">
-                    <FadeIn>
-                        <div className="flex items-center gap-2.5 mb-6">
-                            <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
-                                <Shield className="size-4 text-foreground" />
-                            </div>
-                            <h2 className="text-xl font-bold text-foreground text-balance">Security Best Practices</h2>
+
+                    <div className="flex items-center gap-2.5 mb-6">
+                        <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
+                            <Shield className="size-4 text-foreground" />
                         </div>
-                    </FadeIn>
+                        <h2 className="text-xl font-bold text-foreground text-balance">Security Best Practices</h2>
+                    </div>
+
 
                     <div className="grid sm:grid-cols-2 gap-4">
                         {[
@@ -522,62 +520,60 @@ export default function GuidePage() {
                             { icon: Key, title: "Verify via JWKS", desc: "Always validate the JWT signature using JWKS public keys. Never just decode and trust the payload." },
                             { icon: Clock, title: "Respect token expiration", desc: "better-auth JWTs are short-lived by default. Always check the exp claim and reject expired tokens." },
                             { icon: Tag, title: "Validate issuer & audience", desc: "Ensure iss and aud claims match your Better Auth URL to prevent cross-service token misuse." },
-                        ].map((note, i) => (
-                            <FadeIn key={note.title} delay={i * 0.08}>
-                                <div className="group flex gap-4 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-5 hover:-translate-y-0.5 transition-transform duration-200">
-                                    <div className="flex-shrink-0 flex items-center justify-center size-10 rounded-lg bg-muted group-hover:bg-muted/80 transition-colors">
-                                        <note.icon className="size-5 text-foreground" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-medium text-foreground text-sm mb-1">{note.title}</h3>
-                                        <p className="text-muted-foreground text-xs leading-relaxed text-pretty">{note.desc}</p>
-                                    </div>
+                        ].map((note) => (
+                            <div key={note.title} className="group flex gap-4 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-5 hover:-translate-y-0.5 transition-transform duration-200">
+                                <div className="flex-shrink-0 flex items-center justify-center size-10 rounded-lg bg-muted group-hover:bg-muted/80 transition-colors">
+                                    <note.icon className="size-5 text-foreground" />
                                 </div>
-                            </FadeIn>
+                                <div>
+                                    <h3 className="font-medium text-foreground text-sm mb-1">{note.title}</h3>
+                                    <p className="text-muted-foreground text-xs leading-relaxed text-pretty">{note.desc}</p>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </section>
 
                 {/* ── Customize with AI ──────────────────────────────────── */}
                 <section className="mb-16">
-                    <FadeIn>
-                        <div className="flex items-center gap-2.5 mb-2">
-                            <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
-                                <Sparkles className="size-4 text-foreground" />
-                            </div>
-                            <h2 className="text-xl font-bold text-foreground text-balance">Customize with AI</h2>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-6 ml-[42px] text-pretty">
-                            Give this prompt to your AI coding assistant (Cursor, Copilot, Claude Code, etc.) to strip the demo UI and set up your app.
-                        </p>
-                    </FadeIn>
 
-                    <FadeIn delay={0.05}>
-                        <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
-                            <div className="flex items-center justify-between border-b border-border/50 px-5 py-3">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Agent Prompt</span>
-                                <CopyButton text={customizePrompt} />
-                            </div>
-                            <pre className="p-5 text-sm font-mono text-foreground/80 leading-relaxed overflow-x-auto whitespace-pre-wrap">
-                                {customizePrompt}
-                            </pre>
+                    <div className="flex items-center gap-2.5 mb-2">
+                        <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
+                            <Sparkles className="size-4 text-foreground" />
                         </div>
-                    </FadeIn>
+                        <h2 className="text-xl font-bold text-foreground text-balance">Customize with AI</h2>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-6 ml-[42px] text-pretty">
+                        Give this prompt to your AI coding assistant (Cursor, Copilot, Claude Code, etc.) to strip the demo UI and set up your app.
+                    </p>
+
+
+
+                    <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
+                        <div className="flex items-center justify-between border-b border-border/50 px-5 py-3">
+                            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Agent Prompt</span>
+                            <CopyButton text={customizePrompt} />
+                        </div>
+                        <pre className="p-5 text-sm font-mono text-foreground/80 leading-relaxed overflow-x-auto whitespace-pre-wrap">
+                            {customizePrompt}
+                        </pre>
+                    </div>
+
                 </section>
 
                 {/* ── Project Structure ────────────────────────────────────── */}
                 <section className="mb-16">
-                    <FadeIn>
-                        <div className="flex items-center gap-2.5 mb-6">
-                            <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
-                                <FolderTree className="size-4 text-foreground" />
-                            </div>
-                            <h2 className="text-xl font-bold text-foreground text-balance">Project Structure</h2>
+
+                    <div className="flex items-center gap-2.5 mb-6">
+                        <div className="flex items-center justify-center size-8 rounded-lg bg-muted">
+                            <FolderTree className="size-4 text-foreground" />
                         </div>
-                    </FadeIn>
-                    <FadeIn delay={0.05}>
-                        <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
-                            <pre className="p-5 text-sm font-mono text-foreground/80 leading-relaxed overflow-x-auto">{`src/
+                        <h2 className="text-xl font-bold text-foreground text-balance">Project Structure</h2>
+                    </div>
+
+
+                    <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
+                        <pre className="p-5 text-sm font-mono text-foreground/80 leading-relaxed overflow-x-auto">{`src/
 ├── app/
 │   ├── api/auth/[...all]/   # Better Auth handler
 │   ├── api/[...path]/       # JWT-injecting API proxy
@@ -595,8 +591,8 @@ export default function GuidePage() {
     ├── auth.ts              # Better Auth server config
     ├── auth-client.ts       # Better Auth client
     └── api-client.ts        # Fetch wrapper with JWT`}</pre>
-                        </div>
-                    </FadeIn>
+                    </div>
+
                 </section>
 
             </main>
