@@ -27,7 +27,7 @@ function LoginRequiredInner({ children }: { children: React.ReactNode }) {
         }
     }, [callbackUrl, isPending, router, session])
 
-    if (isPending || !session?.user) {
+    if (isPending || !session?.user || !session?.user?.emailVerified) {
         return null
     }
 
