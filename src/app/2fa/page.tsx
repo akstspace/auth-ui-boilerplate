@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "motion/react"
 import { authClient } from "@/lib/auth-client"
@@ -10,7 +10,7 @@ import { ShieldCheck } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { getAuthFlowParams, resolveCallbackUrl } from "@/lib/auth-flow"
 
-export default function TwoFactorPage() {
+function TwoFactorContent() {
     const [code, setCode] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
@@ -141,5 +141,13 @@ export default function TwoFactorPage() {
                 </button>
             </motion.div>
         </div>
+    )
+}
+
+export default function TwoFactorPage() {
+    return (
+        <Suspense fallback={null}>
+            <TwoFactorContent />
+        </Suspense>
     )
 }

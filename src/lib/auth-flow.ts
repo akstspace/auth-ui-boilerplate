@@ -8,6 +8,7 @@ export interface AuthFlowParams {
 const sanitizeCallbackUrl = (value: string | null): string | null => {
   if (!value) return null;
   if (!value.startsWith(INTERNAL_CALLBACK_PREFIX)) return null;
+  if (value.startsWith("//")) return null;
   return value;
 };
 

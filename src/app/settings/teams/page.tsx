@@ -264,7 +264,8 @@ export default function TeamsPage() {
     }, [])
 
     useEffect(() => {
-        if (!canManageOrg && !roleLoading) {
+        if (roleLoading) return
+        if (!canManageOrg) {
             setLoading(false)
             return
         }
@@ -302,10 +303,20 @@ export default function TeamsPage() {
                     : ""
 
             if (createdTeamId && session?.user?.id) {
-                await authClient.organization.addTeamMember({
-                    teamId: createdTeamId,
-                    userId: session.user.id,
-                })
+                try {
+                    await authClient.organization.addTeamMember({
+                        teamId: createdTeamId,
+                        userId: session.user.id,
+                    })
+                } catch (addMemberError) {
+                    console.error(
+                        `Failed to add creator (userId=${session.user.id}) to team (teamId=${createdTeamId}):`,
+                        addMemberError,
+                    )
+                    setTeamError(
+                        getAuthErrorMessage(addMemberError, "Team created but failed to add you as a member."),
+                    )
+                }
             }
 
             setNewTeamName("")

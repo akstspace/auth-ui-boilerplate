@@ -89,7 +89,7 @@ export async function sendEmail(opts: EmailOptions): Promise<void> {
 
     console.log(`📧 Email sent → ${maskEmail(opts.to)} (messageId: ${info.messageId})`);
   } catch (error) {
-    console.log(`❌ Failed to send email to ${maskEmail(opts.to)}:`, error);
+    console.error(`❌ Failed to send email to ${maskEmail(opts.to)}:`, error);
     throw error;
   }
 }

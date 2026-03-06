@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Building2, Plus, Loader2, Pencil, Trash2, Check, X } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
+import { generateSlug } from "@/lib/utils"
 
 interface Organization {
     id: string
@@ -59,7 +60,8 @@ export default function OrganizationsPage() {
     }, [])
 
     useEffect(() => {
-        if (!canManageOrg && !roleLoading) {
+        if (roleLoading) return
+        if (!canManageOrg) {
             setLoading(false)
             return
         }
@@ -71,8 +73,14 @@ export default function OrganizationsPage() {
         setCreating(true)
         setError("")
         try {
-            const slug = newName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
-            const { data, error: err } = await authClient.organization.create({ name: newName, slug })
+            const trimmed = newName.trim()
+            const slug = generateSlug(trimmed)
+            if (!slug) {
+                setError("Organization name must contain at least one letter or number.")
+                setCreating(false)
+                return
+            }
+            const { data, error: err } = await authClient.organization.create({ name: trimmed, slug })
             if (err) {
                 setError(getAuthErrorMessage(err, "Failed to create organization."))
                 return

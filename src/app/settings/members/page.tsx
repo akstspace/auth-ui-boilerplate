@@ -72,6 +72,19 @@ export default function MembersPage() {
                 authClient.organization.listTeams(),
             ])
 
+            if (membersRes.error) {
+                setError(getAuthErrorMessage(membersRes.error, "Failed to load members."))
+                return
+            }
+            if (invitationsRes.error) {
+                setError(getAuthErrorMessage(invitationsRes.error, "Failed to load invitations."))
+                return
+            }
+            if (teamsRes.error) {
+                setError(getAuthErrorMessage(teamsRes.error, "Failed to load teams."))
+                return
+            }
+
             const mData = membersRes.data as unknown
             const membersList = Array.isArray(mData)
                 ? mData
@@ -91,7 +104,7 @@ export default function MembersPage() {
             const tData = teamsRes.data as unknown
             setTeams((Array.isArray(tData) ? tData : []) as Team[])
         } catch (err) {
-            console.log("Failed to load members/invitations:", err)
+            console.error("Failed to load members/invitations:", err)
             setError(getAuthErrorMessage(err, "Failed to load members and invitations."))
         } finally {
             setLoading(false)
@@ -99,7 +112,8 @@ export default function MembersPage() {
     }, [])
 
     useEffect(() => {
-        if (!canManageOrg && !roleLoading) {
+        if (roleLoading) return
+        if (!canManageOrg) {
             setLoading(false)
             return
         }

@@ -42,8 +42,12 @@ export const getAuthErrorMessage = (
 ): string => {
   const parsed = findBetterAuthError(error);
   if (parsed?.message) return parsed.message;
+  if (parsed?.code) return parsed.code;
 
   if (error instanceof Error && error.message) return error.message;
+
+  const errorFields = readErrorFields(error);
+  if (errorFields?.code) return errorFields.code;
 
   return fallback;
 };

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import Link from "next/link"
 import { motion } from "motion/react"
 import { authClient } from "@/lib/auth-client"
@@ -11,7 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { getAuthFlowParams, getInvitationCallbackUrl, resolveCallbackUrl, withAuthFlow } from "@/lib/auth-flow"
 
-export default function SignUpPage() {
+function SignUpContent() {
   const [emailLoading, setEmailLoading] = useState(false)
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [firstName, setFirstName] = useState("")
@@ -218,5 +218,13 @@ export default function SignUpPage() {
         </p>
       </motion.div>
     </div>
+  )
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignUpContent />
+    </Suspense>
   )
 }

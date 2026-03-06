@@ -116,7 +116,7 @@ async function handler(request: NextRequest, { params }: { params: Promise<{ pat
       headers: responseHeaders,
     })
   } catch (error) {
-    console.log('Proxy error:', error)
+    console.error('Proxy error:', error)
     return NextResponse.json(
       { error: 'Failed to proxy request' },
       { status: 500 }
