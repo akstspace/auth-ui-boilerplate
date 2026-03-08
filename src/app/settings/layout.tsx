@@ -37,12 +37,12 @@ const isOrgManagerRole = (role: string | undefined) => {
 
 const ORG_NAV_ITEMS: NavItem[] = [
     { href: "/settings/members", label: "Members", icon: Users },
-    { href: "/settings/organizations", label: "Organizations", icon: Building2 },
     { href: "/settings/teams", label: "Teams", icon: UsersRound },
 ]
 
 const ACCOUNT_NAV_ITEMS: NavItem[] = [
     { href: "/settings/profile", label: "Profile", icon: User },
+    { href: "/settings/organizations", label: "Organizations", icon: Building2 },
     { href: "/settings/passkeys", label: "Passkeys", icon: Fingerprint },
     { href: "/settings/security", label: "Security", icon: Shield },
 ]

@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Building2, Plus, Loader2, Pencil, Trash2, Check, X } from "lucide-react"
+import { Building2, Plus, Loader2, Pencil, Trash2, Check, X, LogOut } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { generateSlug } from "@/lib/utils"
 import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
@@ -44,8 +44,9 @@ export default function OrganizationsPage() {
     const [editSlug, setEditSlug] = useState("")
     const [error, setError] = useState("")
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; orgId: string; orgName: string }>({ open: false, orgId: "", orgName: "" })
+    const [leaveConfirm, setLeaveConfirm] = useState<{ open: boolean; orgId: string; orgName: string }>({ open: false, orgId: "", orgName: "" })
 
-    const canManageOrg = isOrgManagerRole(activeMemberRole?.role)
+    const canManageActiveOrg = isOrgManagerRole(activeMemberRole?.role)
 
     const fetchOrgs = useCallback(async () => {
         try {
@@ -64,12 +65,8 @@ export default function OrganizationsPage() {
 
     useEffect(() => {
         if (roleLoading) return
-        if (!canManageOrg) {
-            setLoading(false)
-            return
-        }
         fetchOrgs()
-    }, [canManageOrg, fetchOrgs, roleLoading])
+    }, [fetchOrgs, roleLoading])
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -150,21 +147,33 @@ export default function OrganizationsPage() {
         setEditSlug(org.slug)
     }
 
+    const handleLeave = (orgId: string, orgName: string) => {
+        setLeaveConfirm({ open: true, orgId, orgName })
+    }
+
+    const handleConfirmLeave = async () => {
+        const { orgId } = leaveConfirm
+        setLeaveConfirm({ open: false, orgId: "", orgName: "" })
+        try {
+            const { error: err } = await authClient.organization.leave({ organizationId: orgId })
+            if (err) {
+                setError(getAuthErrorMessage(err, "Failed to leave organization."))
+                return
+            }
+            if (orgId === currentOrgId) {
+                router.push("/")
+            } else {
+                fetchOrgs()
+            }
+        } catch (err) {
+            setError(getAuthErrorMessage(err, "Failed to leave organization."))
+        }
+    }
+
     if (loading || roleLoading) {
         return (
             <div className="flex items-center justify-center py-20">
                 <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            </div>
-        )
-    }
-
-    if (!canManageOrg) {
-        return (
-            <div className="rounded-xl border border-border/50 bg-card/30 p-6">
-                <h1 className="text-xl font-bold text-foreground">Organizations</h1>
-                <p className="mt-2 text-sm text-muted-foreground">
-                    Only organization owners and admins can manage organization settings.
-                </p>
             </div>
         )
     }
@@ -259,6 +268,7 @@ export default function OrganizationsPage() {
                                         <p className="truncate text-xs text-muted-foreground">{org.slug} · {org.id.slice(0, 8)}…</p>
                                     </div>
                                 </div>
+                                {canManageActiveOrg && org.id === currentOrgId && (
                                 <div className="flex shrink-0 items-center gap-2">
                                     <button onClick={() => startEdit(org)} className="text-muted-foreground transition-colors hover:text-foreground" title="Edit" aria-label="Edit organization">
                                         <Pencil className="size-3.5" />
@@ -267,6 +277,12 @@ export default function OrganizationsPage() {
                                         <Trash2 className="size-3.5" />
                                     </button>
                                 </div>
+                                )}
+                                {(org.id !== currentOrgId || activeMemberRole?.role !== "owner") && (
+                                <button onClick={() => handleLeave(org.id, org.name)} className="ml-2 shrink-0 text-muted-foreground transition-colors hover:text-orange-500" title="Leave organization" aria-label="Leave organization">
+                                    <LogOut className="size-3.5" />
+                                </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -294,6 +310,25 @@ export default function OrganizationsPage() {
                     </Button>
                     <Button variant="destructive" onClick={handleConfirmDelete}>
                         Delete
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        <Dialog open={leaveConfirm.open} onOpenChange={(open) => setLeaveConfirm((s) => ({ ...s, open }))}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Leave Organization</DialogTitle>
+                    <DialogDescription>
+                        Are you sure you want to leave <span className="font-medium text-foreground">{leaveConfirm.orgName}</span>? You will lose access and need a new invitation to rejoin.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => setLeaveConfirm({ open: false, orgId: "", orgName: "" })}>
+                        Cancel
+                    </Button>
+                    <Button variant="destructive" onClick={handleConfirmLeave}>
+                        Leave
                     </Button>
                 </DialogFooter>
             </DialogContent>
