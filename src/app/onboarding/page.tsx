@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Building2 } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { generateSlug } from "@/lib/utils"
+import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
 
 export default function OnboardingPage() {
     const [name, setName] = useState("")
@@ -33,9 +34,7 @@ export default function OnboardingPage() {
                 return
             }
             if (data) {
-                const { error: setActiveError } = await authClient.organization.setActive({
-                    organizationId: data.id,
-                })
+                const { error: setActiveError } = await setActiveOrganizationWithTeam(data.id)
                 if (setActiveError) {
                     setError(getAuthErrorMessage(setActiveError, "Failed to activate organization."))
                     return

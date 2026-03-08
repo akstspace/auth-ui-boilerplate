@@ -6,6 +6,7 @@ import { authClient } from "@/lib/auth-client"
 import { BookOpen, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { getAuthErrorMessage } from "@/lib/auth-error"
+import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
 
 export default function HomePage() {
   const { data: session, isPending } = authClient.useSession()
@@ -28,7 +29,7 @@ export default function HomePage() {
       try {
         const { data } = await authClient.organization.list()
         if (data && data.length > 0) {
-          await authClient.organization.setActive({ organizationId: data[0].id })
+          await setActiveOrganizationWithTeam(data[0].id)
           router.replace("/org")
         } else {
           router.replace("/onboarding")

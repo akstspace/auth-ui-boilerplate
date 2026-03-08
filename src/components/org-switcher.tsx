@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
+import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
 import { Building2, ChevronDown, Plus, Check } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 
@@ -60,7 +61,7 @@ export function OrgSwitcher() {
 
     const switchOrg = async (orgId: string) => {
         try {
-            const { error } = await authClient.organization.setActive({ organizationId: orgId })
+            const { error } = await setActiveOrganizationWithTeam(orgId)
             if (error) {
                 console.log(
                     "Failed to switch organization:",

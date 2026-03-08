@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Building2, Plus, Loader2, Pencil, Trash2, Check, X } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { generateSlug } from "@/lib/utils"
+import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
 
 interface Organization {
     id: string
@@ -86,9 +87,7 @@ export default function OrganizationsPage() {
                 return
             }
             if (data) {
-                const { error: activeError } = await authClient.organization.setActive({
-                    organizationId: data.id,
-                })
+                const { error: activeError } = await setActiveOrganizationWithTeam(data.id)
                 if (activeError) {
                     setError(getAuthErrorMessage(activeError, "Failed to activate organization."))
                     return

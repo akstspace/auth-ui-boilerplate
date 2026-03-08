@@ -302,23 +302,6 @@ export default function TeamsPage() {
                     ? String((data as { id: string }).id)
                     : ""
 
-            if (createdTeamId && session?.user?.id) {
-                try {
-                    await authClient.organization.addTeamMember({
-                        teamId: createdTeamId,
-                        userId: session.user.id,
-                    })
-                } catch (addMemberError) {
-                    console.error(
-                        `Failed to add creator (userId=${session.user.id}) to team (teamId=${createdTeamId}):`,
-                        addMemberError,
-                    )
-                    setTeamError(
-                        getAuthErrorMessage(addMemberError, "Team created but failed to add you as a member."),
-                    )
-                }
-            }
-
             setNewTeamName("")
             setTeamSuccess(`Created team "${nextName}".`)
             await fetchBaseData()
@@ -703,7 +686,9 @@ export default function TeamsPage() {
 
                 {!selectedTeam ? (
                     <div className="px-6 py-10 text-center text-sm text-muted-foreground">
-                        No team selected. Click a team above to manage its members.
+                        {teams.length === 0
+                            ? "No teams in this organization yet. Create your first team above."
+                            : "No team selected. Click a team above to manage its members."}
                     </div>
                 ) : (
                     <>
