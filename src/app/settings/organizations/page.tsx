@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "motion/react"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Building2, Plus, Loader2, Pencil, Trash2, Check, X } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { generateSlug } from "@/lib/utils"
@@ -42,6 +43,7 @@ export default function OrganizationsPage() {
     const [editName, setEditName] = useState("")
     const [editSlug, setEditSlug] = useState("")
     const [error, setError] = useState("")
+    const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; orgId: string; orgName: string }>({ open: false, orgId: "", orgName: "" })
 
     const canManageOrg = isOrgManagerRole(activeMemberRole?.role)
 
@@ -119,8 +121,13 @@ export default function OrganizationsPage() {
         }
     }
 
-    const handleDelete = async (orgId: string) => {
-        if (!confirm("Are you sure? This will delete the organization and remove all members.")) return
+    const handleDelete = (orgId: string, orgName: string) => {
+        setDeleteConfirm({ open: true, orgId, orgName })
+    }
+
+    const handleConfirmDelete = async () => {
+        const { orgId } = deleteConfirm
+        setDeleteConfirm({ open: false, orgId: "", orgName: "" })
         try {
             const { error: err } = await authClient.organization.delete({ organizationId: orgId })
             if (err) {
@@ -163,6 +170,7 @@ export default function OrganizationsPage() {
     }
 
     return (
+        <>
         <div className="space-y-8">
             <div className="flex items-center justify-between">
                 <div>
@@ -255,7 +263,7 @@ export default function OrganizationsPage() {
                                     <button onClick={() => startEdit(org)} className="text-muted-foreground transition-colors hover:text-foreground" title="Edit" aria-label="Edit organization">
                                         <Pencil className="size-3.5" />
                                     </button>
-                                    <button onClick={() => handleDelete(org.id)} className="text-muted-foreground transition-colors hover:text-red-500" title="Delete" aria-label="Delete organization">
+                                    <button onClick={() => handleDelete(org.id, org.name)} className="text-muted-foreground transition-colors hover:text-red-500" title="Delete" aria-label="Delete organization">
                                         <Trash2 className="size-3.5" />
                                     </button>
                                 </div>
@@ -271,5 +279,25 @@ export default function OrganizationsPage() {
                 )}
             </div>
         </div>
+
+        <Dialog open={deleteConfirm.open} onOpenChange={(open) => setDeleteConfirm((s) => ({ ...s, open }))}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Delete Organization</DialogTitle>
+                    <DialogDescription>
+                        Are you sure you want to delete <span className="font-medium text-foreground">{deleteConfirm.orgName}</span>? This will permanently remove the organization and all its members.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => setDeleteConfirm({ open: false, orgId: "", orgName: "" })}>
+                        Cancel
+                    </Button>
+                    <Button variant="destructive" onClick={handleConfirmDelete}>
+                        Delete
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        </>
     )
 }

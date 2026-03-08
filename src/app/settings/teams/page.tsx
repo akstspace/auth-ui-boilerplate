@@ -5,6 +5,14 @@ import { authClient } from "@/lib/auth-client"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import {
     Select,
@@ -120,6 +128,10 @@ export default function TeamsPage() {
     const [teamSuccess, setTeamSuccess] = useState("")
     const [membershipError, setMembershipError] = useState("")
     const [membershipSuccess, setMembershipSuccess] = useState("")
+
+    const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; teamId: string; teamName: string }>(
+        { open: false, teamId: "", teamName: "" },
+    )
 
     const { data: activeMemberRole, isPending: roleLoading } = authClient.useActiveMemberRole()
     const { data: session } = authClient.useSession()
@@ -339,10 +351,13 @@ export default function TeamsPage() {
         }
     }
 
-    const handleDeleteTeam = async (teamId: string, teamName: string) => {
-        const confirmed = window.confirm(`Delete team \"${teamName}\"? This cannot be undone.`)
-        if (!confirmed) return
+    const handleDeleteTeam = (teamId: string, teamName: string) => {
+        setDeleteConfirm({ open: true, teamId, teamName })
+    }
 
+    const handleConfirmDelete = async () => {
+        const { teamId, teamName } = deleteConfirm
+        setDeleteConfirm((prev) => ({ ...prev, open: false }))
         setDeletingTeamId(teamId)
         setTeamError("")
         setTeamSuccess("")
@@ -467,6 +482,7 @@ export default function TeamsPage() {
     }
 
     return (
+        <>
         <div className="space-y-8">
             {/* Page header */}
             <div>
@@ -614,7 +630,7 @@ export default function TeamsPage() {
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => void handleDeleteTeam(team.id, team.name)}
+                                                    onClick={() => handleDeleteTeam(team.id, team.name)}
                                                     className="text-muted-foreground transition-colors hover:text-destructive"
                                                     aria-label="Delete team"
                                                     title="Delete team"
@@ -799,5 +815,39 @@ export default function TeamsPage() {
                 )}
             </div>
         </div>
+
+        {/* Delete team confirmation dialog */}
+        <Dialog
+            open={deleteConfirm.open}
+            onOpenChange={(open) => setDeleteConfirm((prev) => ({ ...prev, open }))}
+        >
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Delete team</DialogTitle>
+                    <DialogDescription>
+                        Are you sure you want to delete{" "}
+                        <span className="font-medium text-foreground">{deleteConfirm.teamName}</span>?
+                        This action cannot be undone.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setDeleteConfirm((prev) => ({ ...prev, open: false }))}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => void handleConfirmDelete()}
+                    >
+                        Delete
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        </>
     )
 }
