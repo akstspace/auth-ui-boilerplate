@@ -29,7 +29,15 @@ export default function HomePage() {
       try {
         const { data } = await authClient.organization.list()
         if (data && data.length > 0) {
-          await setActiveOrganizationWithTeam(data[0].id)
+          const { error: activationError } = await setActiveOrganizationWithTeam(data[0].id)
+          if (activationError) {
+            console.error(
+              "Failed to activate organization:",
+              getAuthErrorMessage(activationError, "Could not activate organization."),
+            )
+            router.replace("/onboarding")
+            return
+          }
           router.replace("/org")
         } else {
           router.replace("/onboarding")

@@ -44,6 +44,8 @@ export default function OrganizationsPage() {
     const [editSlug, setEditSlug] = useState("")
     const [error, setError] = useState("")
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; orgId: string; orgName: string }>({ open: false, orgId: "", orgName: "" })
+    const [deletingOrganizationId, setDeletingOrganizationId] = useState<string | null>(null)
+    const [deleteError, setDeleteError] = useState("")
     const [leaveConfirm, setLeaveConfirm] = useState<{ open: boolean; orgId: string; orgName: string }>({ open: false, orgId: "", orgName: "" })
 
     const canManageActiveOrg = isOrgManagerRole(activeMemberRole?.role)
@@ -119,25 +121,30 @@ export default function OrganizationsPage() {
     }
 
     const handleDelete = (orgId: string, orgName: string) => {
+        setDeleteError("")
         setDeleteConfirm({ open: true, orgId, orgName })
     }
 
     const handleConfirmDelete = async () => {
         const { orgId } = deleteConfirm
-        setDeleteConfirm({ open: false, orgId: "", orgName: "" })
+        setDeletingOrganizationId(orgId)
+        setDeleteError("")
         try {
             const { error: err } = await authClient.organization.delete({ organizationId: orgId })
             if (err) {
-                setError(getAuthErrorMessage(err, "Failed to delete organization."))
+                setDeleteError(getAuthErrorMessage(err, "Failed to delete organization."))
                 return
             }
+            setDeleteConfirm({ open: false, orgId: "", orgName: "" })
             if (orgId === currentOrgId) {
                 router.push("/")
             } else {
                 fetchOrgs()
             }
         } catch (err) {
-            setError(getAuthErrorMessage(err, "Failed to delete organization."))
+            setDeleteError(getAuthErrorMessage(err, "Failed to delete organization."))
+        } finally {
+            setDeletingOrganizationId(null)
         }
     }
 
@@ -273,7 +280,7 @@ export default function OrganizationsPage() {
                                     <button onClick={() => startEdit(org)} className="text-muted-foreground transition-colors hover:text-foreground" title="Edit" aria-label="Edit organization">
                                         <Pencil className="size-3.5" />
                                     </button>
-                                    <button onClick={() => handleDelete(org.id, org.name)} className="text-muted-foreground transition-colors hover:text-red-500" title="Delete" aria-label="Delete organization">
+                                    <button onClick={() => handleDelete(org.id, org.name)} disabled={deletingOrganizationId === org.id} className="text-muted-foreground transition-colors hover:text-red-500 disabled:opacity-50 disabled:cursor-not-allowed" title="Delete" aria-label="Delete organization">
                                         <Trash2 className="size-3.5" />
                                     </button>
                                 </div>
@@ -305,11 +312,12 @@ export default function OrganizationsPage() {
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button variant="ghost" onClick={() => setDeleteConfirm({ open: false, orgId: "", orgName: "" })}>
+                    {deleteError && <p className="mr-auto text-sm text-red-500">{deleteError}</p>}
+                    <Button variant="ghost" disabled={!!deletingOrganizationId} onClick={() => setDeleteConfirm({ open: false, orgId: "", orgName: "" })}>
                         Cancel
                     </Button>
-                    <Button variant="destructive" onClick={handleConfirmDelete}>
-                        Delete
+                    <Button variant="destructive" disabled={!!deletingOrganizationId} onClick={handleConfirmDelete}>
+                        {deletingOrganizationId ? <><Loader2 className="mr-1.5 size-3.5 animate-spin" />Deleting…</> : "Delete"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

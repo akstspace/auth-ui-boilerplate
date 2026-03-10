@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import { member, team, teamMember } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { APIError } from "better-auth/api";
 import {
   jwt,
   lastLoginMethod,
@@ -165,6 +166,48 @@ export const auth = betterAuth({
         },
       },
       organizationHooks: {
+        /**
+         * Before adding a team member, check inside a transaction (with a
+         * SELECT FOR UPDATE lock on the org-member row) that the user is not
+         * already in another team within this organization. This prevents a
+         * race condition where two concurrent inserts could both pass the
+         * plain-SELECT check.
+         */
+        beforeAddTeamMember: async ({ teamMember: newMember, organization: activeOrg }) => {
+          await db.transaction(async (tx) => {
+            // Acquire a row-level lock on the org-member record to serialise
+            // concurrent requests for the same user in the same org.
+            await tx
+              .select({ id: member.id })
+              .from(member)
+              .where(
+                and(
+                  eq(member.userId, newMember.userId),
+                  eq(member.organizationId, activeOrg.id),
+                ),
+              )
+              .for("update");
+
+            const existingTeams = await tx
+              .select({ id: teamMember.id })
+              .from(teamMember)
+              .innerJoin(team, eq(teamMember.teamId, team.id))
+              .where(
+                and(
+                  eq(teamMember.userId, newMember.userId),
+                  eq(team.organizationId, activeOrg.id),
+                ),
+              );
+
+            if (existingTeams.length > 0) {
+              throw new APIError("BAD_REQUEST", {
+                message:
+                  "User is already part of a team in this organization. Users can only be in one team at a time.",
+              });
+            }
+          });
+        },
+
         /**
          * When a new member joins the org as admin/owner, immediately add them
          * to every existing team so `listTeamMembers` works natively for them.

@@ -400,25 +400,6 @@ export default function TeamsPage() {
 
             const addedMember = memberDirectory.get(selectedUserId)
 
-            // Auto-add admins / owners to all other teams in the org.
-            const addedRole = addedMember?.role ?? ""
-            const isManager = addedRole
-                .split(",")
-                .map((r) => r.trim())
-                .some((r) => r === "owner" || r === "admin")
-
-            if (isManager) {
-                const otherTeams = teams.filter((t) => t.id !== selectedTeamId)
-                await Promise.allSettled(
-                    otherTeams.map((t) =>
-                        authClient.organization.addTeamMember({
-                            teamId: t.id,
-                            userId: selectedUserId,
-                        }),
-                    ),
-                )
-            }
-
             setMembershipSuccess(
                 `Added ${addedMember?.user.name || addedMember?.user.email || "member"} to ${selectedTeam?.name || "team"}.`,
             )
