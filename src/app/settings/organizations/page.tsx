@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Building2, Plus, Loader2, Pencil, Trash2, Check, X, LogOut } from "lucide-react"
+import { Building2, Plus, Loader2, Pencil, Trash2, Check, X } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { generateSlug } from "@/lib/utils"
 import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
@@ -46,7 +46,6 @@ export default function OrganizationsPage() {
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; orgId: string; orgName: string }>({ open: false, orgId: "", orgName: "" })
     const [deletingOrganizationId, setDeletingOrganizationId] = useState<string | null>(null)
     const [deleteError, setDeleteError] = useState("")
-    const [leaveConfirm, setLeaveConfirm] = useState<{ open: boolean; orgId: string; orgName: string }>({ open: false, orgId: "", orgName: "" })
 
     const canManageActiveOrg = isOrgManagerRole(activeMemberRole?.role)
 
@@ -152,29 +151,6 @@ export default function OrganizationsPage() {
         setEditingId(org.id)
         setEditName(org.name)
         setEditSlug(org.slug)
-    }
-
-    const handleLeave = (orgId: string, orgName: string) => {
-        setLeaveConfirm({ open: true, orgId, orgName })
-    }
-
-    const handleConfirmLeave = async () => {
-        const { orgId } = leaveConfirm
-        setLeaveConfirm({ open: false, orgId: "", orgName: "" })
-        try {
-            const { error: err } = await authClient.organization.leave({ organizationId: orgId })
-            if (err) {
-                setError(getAuthErrorMessage(err, "Failed to leave organization."))
-                return
-            }
-            if (orgId === currentOrgId) {
-                router.push("/")
-            } else {
-                fetchOrgs()
-            }
-        } catch (err) {
-            setError(getAuthErrorMessage(err, "Failed to leave organization."))
-        }
     }
 
     if (loading || roleLoading) {
@@ -285,11 +261,6 @@ export default function OrganizationsPage() {
                                     </button>
                                 </div>
                                 )}
-                                {(org.id !== currentOrgId || activeMemberRole?.role !== "owner") && (
-                                <button onClick={() => handleLeave(org.id, org.name)} className="ml-2 shrink-0 text-muted-foreground transition-colors hover:text-orange-500" title="Leave organization" aria-label="Leave organization">
-                                    <LogOut className="size-3.5" />
-                                </button>
-                                )}
                             </div>
                         )}
                     </div>
@@ -318,25 +289,6 @@ export default function OrganizationsPage() {
                     </Button>
                     <Button variant="destructive" disabled={!!deletingOrganizationId} onClick={handleConfirmDelete}>
                         {deletingOrganizationId ? <><Loader2 className="mr-1.5 size-3.5 animate-spin" />Deleting…</> : "Delete"}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-
-        <Dialog open={leaveConfirm.open} onOpenChange={(open) => setLeaveConfirm((s) => ({ ...s, open }))}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Leave Organization</DialogTitle>
-                    <DialogDescription>
-                        Are you sure you want to leave <span className="font-medium text-foreground">{leaveConfirm.orgName}</span>? You will lose access and need a new invitation to rejoin.
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                    <Button variant="ghost" onClick={() => setLeaveConfirm({ open: false, orgId: "", orgName: "" })}>
-                        Cancel
-                    </Button>
-                    <Button variant="destructive" onClick={handleConfirmLeave}>
-                        Leave
                     </Button>
                 </DialogFooter>
             </DialogContent>
