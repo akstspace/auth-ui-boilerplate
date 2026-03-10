@@ -109,37 +109,47 @@ export function TeamSwitcher() {
                         onClick={() => setOpen(false)}
                         aria-hidden
                     />
-                    <ul
-                        className="absolute left-0 top-full z-50 mt-1.5 min-w-40 rounded-lg border border-border/60 bg-popover shadow-md"
-                        aria-label="Switch team"
-                    >
-                        <div className="px-2 py-1.5">
-                            <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">
-                                Teams
-                            </p>
+                    <div className="absolute left-0 top-full z-50 mt-1.5 min-w-40 rounded-lg border border-border/60 bg-popover shadow-md">
+                        <p
+                            id="team-switcher-label"
+                            className="px-4 pb-1 pt-1.5 text-xs font-medium text-muted-foreground"
+                        >
+                            Teams
+                        </p>
+                        <ul
+                            role="listbox"
+                            aria-labelledby="team-switcher-label"
+                            className="px-2 pb-1.5"
+                        >
                             {teams.map((t) => {
                                 const isActive =
                                     t.id === (displayTeamId ?? teams[0]?.id)
                                 return (
-                                    <li key={t.id}>
-                                        <button
-                                            type="button"
-                                            onClick={() => void handleSelect(t.id)}
-                                            className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
-                                            aria-current={isActive ? "true" : undefined}
-                                        >
-                                            <span className="flex-1 truncate text-left text-foreground">
-                                                {t.name}
-                                            </span>
-                                            {isActive && (
-                                                <Check className="size-3.5 shrink-0 text-primary" />
-                                            )}
-                                        </button>
+                                    <li
+                                        key={t.id}
+                                        role="option"
+                                        aria-selected={isActive}
+                                        onClick={() => void handleSelect(t.id)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" || e.key === " ") {
+                                                e.preventDefault()
+                                                void handleSelect(t.id)
+                                            }
+                                        }}
+                                        tabIndex={0}
+                                        className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
+                                    >
+                                        <span className="flex-1 truncate text-left text-foreground">
+                                            {t.name}
+                                        </span>
+                                        {isActive && (
+                                            <Check className="size-3.5 shrink-0 text-primary" />
+                                        )}
                                     </li>
                                 )
                             })}
-                        </div>
-                    </ul>
+                        </ul>
+                    </div>
                 </>
             )}
         </div>
