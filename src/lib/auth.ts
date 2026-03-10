@@ -189,7 +189,7 @@ export const auth = betterAuth({
               .for("update");
 
             const existingTeams = await tx
-              .select({ id: teamMember.id })
+              .select({ id: teamMember.id, teamId: teamMember.teamId })
               .from(teamMember)
               .innerJoin(team, eq(teamMember.teamId, team.id))
               .where(
@@ -199,7 +199,10 @@ export const auth = betterAuth({
                 ),
               );
 
-            if (existingTeams.length > 0) {
+            const inDifferentTeam = existingTeams.some(
+              (m) => m.teamId !== newMember.teamId,
+            );
+            if (inDifferentTeam) {
               throw new APIError("BAD_REQUEST", {
                 message:
                   "User is already part of a team in this organization. Users can only be in one team at a time.",
