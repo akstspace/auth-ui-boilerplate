@@ -213,12 +213,7 @@ export const auth = betterAuth({
          * to every existing team so `listTeamMembers` works natively for them.
          */
         afterAddMember: async ({ member: newMember, organization: org }) => {
-          const isManager = newMember.role
-            ?.split(",")
-            .map((r: string) => r.trim())
-            .some((r: string) => r === "owner" || r === "admin");
-
-          if (!isManager) return;
+          if (!isManagerRole(newMember.role)) return;
 
           await addUserToAllOrgTeams(newMember.userId, org.id);
         },
@@ -227,12 +222,7 @@ export const auth = betterAuth({
          * When a member is promoted to admin/owner, add them to all teams.
          */
         afterUpdateMemberRole: async ({ member: updatedMember, organization: org }) => {
-          const isManager = updatedMember.role
-            ?.split(",")
-            .map((r: string) => r.trim())
-            .some((r: string) => r === "owner" || r === "admin");
-
-          if (!isManager) return;
+          if (!isManagerRole(updatedMember.role)) return;
 
           await addUserToAllOrgTeams(updatedMember.userId, org.id);
         },
