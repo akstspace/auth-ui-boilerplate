@@ -7,6 +7,7 @@ import { passkeyClient } from "@better-auth/passkey/client";
 import { lastLoginMethodClient, twoFactorClient } from "better-auth/client/plugins";
 import { getAuthErrorMessage } from "@/lib/auth-error";
 import { withAuthFlow } from "@/lib/auth-flow";
+import { adminClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
   baseURL:
@@ -27,6 +28,7 @@ export const authClient = createAuthClient({
         });
       },
     }),
+    adminClient(),
   ],
   fetchOptions: {
     onError: async (ctx) => {

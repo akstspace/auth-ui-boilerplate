@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { type FormEvent, Suspense, useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "motion/react"
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Lock, Fingerprint, ChevronDown } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { getAuthFlowParams, resolveCallbackUrl, withAuthFlow } from "@/lib/auth-flow"
+import { buildAuthErrorUrl, getBannedMessage, isBannedError } from "@/lib/banned-user"
 
 function LoginContent() {
   const [passkeyLoading, setPasskeyLoading] = useState(false)
@@ -24,10 +25,21 @@ function LoginContent() {
   const searchParams = useSearchParams()
   const { data: session, isPending } = authClient.useSession()
 
-  const flow = getAuthFlowParams(searchParams)
-  const callbackTarget = resolveCallbackUrl(flow)
+    const flow = getAuthFlowParams(searchParams)
+    const callbackTarget = resolveCallbackUrl(flow)
 
   useEffect(() => {
+    if (searchParams.get("error") === "banned") {
+      router.replace(
+        buildAuthErrorUrl({
+          error: "banned",
+          errorDescription: searchParams.get("error_description"),
+          email: searchParams.get("email"),
+        }),
+      )
+      return
+    }
+
     const method = authClient.getLastUsedLoginMethod()
     if (method) {
       setLastMethod(method)
@@ -41,7 +53,7 @@ function LoginContent() {
       setSuccessMessage("Password reset successfully. Sign in with your new password.")
       setShowPasswordForm(true)
     }
-  }, [searchParams])
+  }, [router, searchParams])
 
   useEffect(() => {
     if (!isPending && session?.user) {
@@ -57,9 +69,27 @@ function LoginContent() {
         callbackURL: callbackTarget,
       })
       if (result.error) {
+        if (isBannedError(result.error)) {
+          router.replace(
+            buildAuthErrorUrl({
+              error: "banned",
+              errorDescription: getBannedMessage(result.error),
+            }),
+          )
+          return
+        }
         setError(getAuthErrorMessage(result.error, "Google sign in failed."))
       }
     } catch (err) {
+      if (isBannedError(err)) {
+        router.replace(
+          buildAuthErrorUrl({
+            error: "banned",
+            errorDescription: getBannedMessage(err),
+          }),
+        )
+        return
+      }
       setError(getAuthErrorMessage(err, "An unexpected error occurred."))
     }
   }
@@ -74,19 +104,37 @@ function LoginContent() {
             router.push(callbackTarget)
           },
           onError(context) {
+            if (isBannedError(context.error)) {
+              router.replace(
+                buildAuthErrorUrl({
+                  error: "banned",
+                  errorDescription: getBannedMessage(context.error),
+                }),
+              )
+              return
+            }
             setError(getAuthErrorMessage(context.error, "Passkey authentication failed."))
           },
         },
       })
     } catch (err) {
       if (err instanceof Error && err.name === "NotAllowedError") return
+      if (isBannedError(err)) {
+        router.replace(
+          buildAuthErrorUrl({
+            error: "banned",
+            errorDescription: getBannedMessage(err),
+          }),
+        )
+        return
+      }
       setError(getAuthErrorMessage(err, "Passkey authentication failed. Try another method."))
     } finally {
       setPasskeyLoading(false)
     }
   }
 
-  const handleEmailSignIn = async (e: React.FormEvent) => {
+  const handleEmailSignIn = async (e: FormEvent) => {
     e.preventDefault()
     setEmailLoading(true)
     setError("")
@@ -114,9 +162,29 @@ function LoginContent() {
         },
       )
       if (signInError) {
+        if (isBannedError(signInError)) {
+          router.replace(
+            buildAuthErrorUrl({
+              error: "banned",
+              email,
+              errorDescription: getBannedMessage(signInError),
+            }),
+          )
+          return
+        }
         setError(getAuthErrorMessage(signInError, "Invalid email or password."))
       }
     } catch (err) {
+      if (isBannedError(err)) {
+        router.replace(
+          buildAuthErrorUrl({
+            error: "banned",
+            email,
+            errorDescription: getBannedMessage(err),
+          }),
+        )
+        return
+      }
       setError(getAuthErrorMessage(err, "An unexpected error occurred."))
     } finally {
       setEmailLoading(false)

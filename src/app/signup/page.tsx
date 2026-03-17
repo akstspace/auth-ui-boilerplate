@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, Suspense } from "react"
+import { type FormEvent, Suspense, useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "motion/react"
 import { authClient } from "@/lib/auth-client"
@@ -10,6 +10,7 @@ import { UserPlus, ChevronDown } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { getAuthFlowParams, getInvitationCallbackUrl, resolveCallbackUrl, withAuthFlow } from "@/lib/auth-flow"
+import { buildAuthErrorUrl, getBannedMessage, isBannedError } from "@/lib/banned-user"
 
 function SignUpContent() {
   const [emailLoading, setEmailLoading] = useState(false)
@@ -42,14 +43,32 @@ function SignUpContent() {
         callbackURL: callbackTarget,
       })
       if (result.error) {
+        if (isBannedError(result.error)) {
+          router.replace(
+            buildAuthErrorUrl({
+              error: "banned",
+              errorDescription: getBannedMessage(result.error),
+            }),
+          )
+          return
+        }
         setError(getAuthErrorMessage(result.error, "Google sign up failed."))
       }
     } catch (err) {
+      if (isBannedError(err)) {
+        router.replace(
+          buildAuthErrorUrl({
+            error: "banned",
+            errorDescription: getBannedMessage(err),
+          }),
+        )
+        return
+      }
       setError(getAuthErrorMessage(err, "An unexpected error occurred."))
     }
   }
 
-  const handleEmailSignUp = async (e: React.FormEvent) => {
+  const handleEmailSignUp = async (e: FormEvent) => {
     e.preventDefault()
     setEmailLoading(true)
     setError("")

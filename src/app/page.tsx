@@ -7,6 +7,8 @@ import { BookOpen, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
+import { isPlatformAdmin } from "@/lib/platform-admin"
+import { buildAuthErrorUrl, getSessionBanState } from "@/lib/banned-user"
 
 export default function HomePage() {
   const { data: session, isPending } = authClient.useSession()
@@ -16,6 +18,22 @@ export default function HomePage() {
     if (isPending) return
 
     if (!session) return // not logged in — show landing content
+
+    const banState = getSessionBanState(
+      session as { user?: Record<string, unknown> | null } | null,
+    )
+    if (banState.banned) {
+      void authClient.signOut()
+      router.replace(
+        buildAuthErrorUrl({
+          error: "banned",
+          email: banState.email,
+          reason: banState.reason,
+          expiresAt: banState.expiresAt,
+        }),
+      )
+      return
+    }
 
     // Check for active org in session
     const activeOrgId = (session.session as Record<string, unknown>).activeOrganizationId as string | undefined
@@ -40,14 +58,14 @@ export default function HomePage() {
           }
           router.replace("/org")
         } else {
-          router.replace("/onboarding")
+          router.replace(isPlatformAdmin(session.user.role) ? "/admin" : "/onboarding")
         }
       } catch (err) {
         console.log(
           "Failed to resolve organization:",
           getAuthErrorMessage(err, "Could not load organization state."),
         )
-        router.replace("/onboarding")
+        router.replace(isPlatformAdmin(session.user.role) ? "/admin" : "/onboarding")
       }
     }
 

@@ -51,3 +51,13 @@ export const getAuthErrorMessage = (
 
   return fallback;
 };
+
+export const getAuthErrorCode = (error: unknown): string | null => {
+  const parsed = findBetterAuthError(error);
+  if (parsed?.code) return parsed.code;
+
+  const errorFields = readErrorFields(error);
+  if (errorFields?.code) return errorFields.code;
+
+  return null;
+};

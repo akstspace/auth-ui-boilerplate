@@ -8,9 +8,11 @@ import {
     Users,
     BookOpen,
     Loader2,
+    ShieldCheck,
     UsersRound,
 } from "lucide-react"
 import Link from "next/link"
+import { isPlatformAdmin } from "@/lib/platform-admin"
 
 const isOrgManagerRole = (role: string | undefined) => {
     if (!role) return false
@@ -23,6 +25,7 @@ const isOrgManagerRole = (role: string | undefined) => {
 export default function OrgDashboard() {
     const { data: activeOrg, isPending } = authClient.useActiveOrganization()
     const { data: activeMemberRole, isPending: isRolePending } = authClient.useActiveMemberRole()
+    const { data: session } = authClient.useSession()
 
     if (isPending || isRolePending) {
         return (
@@ -33,6 +36,7 @@ export default function OrgDashboard() {
     }
 
     const canManageOrg = isOrgManagerRole(activeMemberRole?.role)
+    const canAccessPlatformAdmin = isPlatformAdmin(session?.user?.role)
 
     const cards = [
         ...(canManageOrg
@@ -69,6 +73,16 @@ export default function OrgDashboard() {
             title: "Integration Guide",
             desc: "Backend setup and JWT docs",
         },
+        ...(canAccessPlatformAdmin
+            ? [
+                  {
+                      href: "/admin",
+                      icon: ShieldCheck,
+                      title: "Platform Admin",
+                      desc: "Manage platform users, sessions, bans, and impersonation",
+                  },
+              ]
+            : []),
     ]
 
     return (

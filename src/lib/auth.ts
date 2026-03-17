@@ -8,6 +8,7 @@ import {
   lastLoginMethod,
   organization,
   twoFactor,
+  admin,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
 import { sendInvitationEmail, sendVerificationEmail, sendPasswordResetEmail, send2FAEmail } from "@/lib/email";
@@ -89,6 +90,10 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
+
+  onAPIError: {
+    errorURL: "/auth/error",
+  },
 
   // ── Account Linking ───────────────────────────────────────────
   account: {
@@ -203,6 +208,11 @@ export const auth = betterAuth({
       otpOptions: {
         sendOTP: send2FAEmail,
       },
+    }),
+
+    admin({
+      bannedUserMessage:
+        "Your account has been suspended. Contact a platform administrator if you think this is a mistake.",
     }),
   ],
 
