@@ -99,8 +99,10 @@ export default function AdminUsersPage() {
         void load()
     }, [query])
 
-    const totalPages = Math.max(1, Math.ceil(total / query.limit || 1))
-    const currentPage = Math.floor(query.offset / query.limit) + 1
+    const safeLimit = Number(query.limit) || 1
+    const safeOffset = Number(query.offset) || 0
+    const totalPages = Math.max(1, Math.ceil(total / safeLimit))
+    const currentPage = Math.floor(safeOffset / safeLimit) + 1
     const hasActiveFilters =
         Boolean(draftQuery.searchValue.trim()) ||
         draftQuery.searchField !== DEFAULT_ADMIN_LIST_QUERY.searchField ||

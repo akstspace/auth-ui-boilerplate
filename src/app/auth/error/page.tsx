@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { useSearchParams } from "next/navigation"
-import { AlertTriangle, Ban, CheckCircle2, RefreshCw } from "lucide-react"
+import { AlertTriangle, Ban, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -121,26 +121,12 @@ export default function AuthErrorPage() {
     const error = searchParams.get("error")
     const errorDescription = searchParams.get("error_description")
     const email = searchParams.get("email")
-    const initialReason = searchParams.get("reason")
+    const reason = searchParams.get("reason")
     const expiresAt = searchParams.get("expiresAt")
     const normalizedError = error?.trim().toLowerCase() ?? null
     const isBanned = normalizedError === "banned" || error === "BANNED_USER"
-    const [resolvedReason, setResolvedReason] = useState(initialReason)
-    const [resolvedExpiry, setResolvedExpiry] = useState(expiresAt)
-    const [loadingReason, setLoadingReason] = useState(false)
-    const [banStillActive, setBanStillActive] = useState(isBanned)
 
     const errorContent = useMemo(() => {
-        if (isBanned && !banStillActive) {
-            return {
-                title: "Access restored",
-                description: "This account is no longer suspended. Sign in again to continue.",
-                help: [
-                    "Return to the sign-in page and try again.",
-                ],
-            }
-        }
-
         if (isBanned) {
             return {
                 title: "Account suspended",
@@ -169,55 +155,11 @@ export default function AuthErrorPage() {
                 "If the issue continues, check your auth configuration or provider setup.",
             ],
         }
-    }, [banStillActive, errorDescription, isBanned, normalizedError])
+    }, [errorDescription, isBanned, normalizedError])
 
-    useEffect(() => {
-        if (!isBanned || !email) return
-
-        let cancelled = false
-        setLoadingReason(true)
-
-        fetch(`/api/banned-status?email=${encodeURIComponent(email)}`)
-            .then(async (response) => {
-                if (!response.ok) return null
-                return (await response.json()) as {
-                    banned?: boolean
-                    reason?: string | null
-                    expiresAt?: string | null
-                }
-            })
-            .then((payload) => {
-                if (cancelled) return
-
-                if (!payload?.banned) {
-                    setBanStillActive(false)
-                    setResolvedReason(null)
-                    setResolvedExpiry(null)
-                    return
-                }
-
-                setBanStillActive(true)
-                setResolvedReason(payload.reason ?? initialReason)
-                setResolvedExpiry(payload.expiresAt ?? expiresAt)
-            })
-            .finally(() => {
-                if (!cancelled) setLoadingReason(false)
-            })
-
-        return () => {
-            cancelled = true
-        }
-    }, [email, expiresAt, initialReason, isBanned])
-
-    const displayExpiry = resolvedExpiry ? new Date(resolvedExpiry) : null
-    const showBanDetails = isBanned && banStillActive
-    const icon = showBanDetails ? (
-        <Ban className="size-5" />
-    ) : errorContent.title === "Access restored" ? (
-        <CheckCircle2 className="size-5" />
-    ) : (
-        <AlertTriangle className="size-5" />
-    )
+    const displayExpiry = expiresAt ? new Date(expiresAt) : null
+    const icon = isBanned ? <Ban className="size-5" /> : <AlertTriangle className="size-5" />
+    const hasSummaryDetails = Boolean(error) || Boolean(email && !isBanned)
 
     return (
         <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-10 text-foreground">
@@ -229,23 +171,25 @@ export default function AuthErrorPage() {
                     <h1 className="text-3xl font-semibold text-balance">{errorContent.title}</h1>
                     <p className="mt-3 text-sm text-muted-foreground text-pretty">{errorContent.description}</p>
 
-                    <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                        {error ? (
-                            <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
-                                <p className="text-xs text-muted-foreground">Error code</p>
-                                <p className="mt-2 text-sm font-medium">{error}</p>
-                            </div>
-                        ) : null}
+                    {hasSummaryDetails ? (
+                        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                            {error ? (
+                                <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
+                                    <p className="text-xs text-muted-foreground">Error code</p>
+                                    <p className="mt-2 text-sm font-medium">{error}</p>
+                                </div>
+                            ) : null}
 
-                        {email && !showBanDetails ? (
-                            <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
-                                <p className="text-xs text-muted-foreground">Account</p>
-                                <p className="mt-2 text-sm font-medium">{email}</p>
-                            </div>
-                        ) : null}
-                    </div>
+                            {email && !isBanned ? (
+                                <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
+                                    <p className="text-xs text-muted-foreground">Account</p>
+                                    <p className="mt-2 text-sm font-medium">{email}</p>
+                                </div>
+                            ) : null}
+                        </div>
+                    ) : null}
 
-                    {showBanDetails ? (
+                    {isBanned ? (
                         <div className="mt-3 space-y-3">
                             {email ? (
                                 <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
@@ -254,15 +198,10 @@ export default function AuthErrorPage() {
                                 </div>
                             ) : null}
 
-                            {resolvedReason ? (
+                            {reason ? (
                                 <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
                                     <p className="text-xs text-muted-foreground">Reason</p>
-                                    <p className="mt-2 text-sm text-foreground">{resolvedReason}</p>
-                                </div>
-                            ) : loadingReason ? (
-                                <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
-                                    <p className="text-xs text-muted-foreground">Reason</p>
-                                    <p className="mt-2 text-sm text-muted-foreground">Loading suspension details...</p>
+                                    <p className="mt-2 text-sm text-foreground">{reason}</p>
                                 </div>
                             ) : null}
 
@@ -298,7 +237,7 @@ export default function AuthErrorPage() {
                         </Button>
                     </div>
 
-                    {showBanDetails ? (
+                    {isBanned ? (
                         <div className="mt-3 rounded-xl border border-border/60 bg-muted/20 px-4 py-3 text-sm text-muted-foreground text-pretty">
                             Contact your platform administrator if you need this suspension reviewed. If an expiry was set, access will return automatically after that time.
                         </div>

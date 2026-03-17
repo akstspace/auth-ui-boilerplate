@@ -45,29 +45,3 @@ export const getBannedMessage = (error: unknown) =>
     error,
     "Your account has been suspended. Contact a platform administrator if you think this is a mistake.",
   );
-
-export const getSessionBanState = (
-  session: { user?: Record<string, unknown> | null } | null | undefined,
-) => {
-  const user = session?.user;
-  if (!user) {
-    return {
-      banned: false,
-      reason: null,
-      expiresAt: null,
-      email: null,
-    };
-  }
-
-    return {
-        banned: Boolean(user.banned),
-        reason: typeof user.banReason === "string" ? user.banReason : null,
-        expiresAt:
-            typeof user.banExpires === "string"
-                ? user.banExpires
-                : user.banExpires instanceof Date
-                  ? user.banExpires.toISOString()
-                  : null,
-        email: typeof user.email === "string" ? user.email : null,
-    };
-};

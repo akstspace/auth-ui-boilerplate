@@ -22,17 +22,22 @@ const readErrorFields = (value: unknown): ErrorWithMessage | null => {
   };
 };
 
-const findBetterAuthError = (value: unknown, depth = 0): ErrorWithMessage | null => {
+const findBetterAuthField = (
+  value: unknown,
+  selectField: (fields: ErrorWithMessage) => string | undefined,
+  depth = 0,
+): string | null => {
   if (depth > 4) return null;
 
   const direct = readErrorFields(value);
-  if (direct?.message || direct?.code) return direct;
-
   if (!direct) return null;
 
+  const selected = selectField(direct);
+  if (selected) return selected;
+
   return (
-    findBetterAuthError(direct.error, depth + 1) ||
-    findBetterAuthError(direct.cause, depth + 1)
+    findBetterAuthField(direct.error, selectField, depth + 1) ||
+    findBetterAuthField(direct.cause, selectField, depth + 1)
   );
 };
 
@@ -40,9 +45,11 @@ export const getAuthErrorMessage = (
   error: unknown,
   fallback: string,
 ): string => {
-  const parsed = findBetterAuthError(error);
-  if (parsed?.message) return parsed.message;
-  if (parsed?.code) return parsed.code;
+  const nestedMessage = findBetterAuthField(error, (fields) => fields.message);
+  if (nestedMessage) return nestedMessage;
+
+  const nestedCode = findBetterAuthField(error, (fields) => fields.code);
+  if (nestedCode) return nestedCode;
 
   if (error instanceof Error && error.message) return error.message;
 
@@ -53,8 +60,8 @@ export const getAuthErrorMessage = (
 };
 
 export const getAuthErrorCode = (error: unknown): string | null => {
-  const parsed = findBetterAuthError(error);
-  if (parsed?.code) return parsed.code;
+  const nestedCode = findBetterAuthField(error, (fields) => fields.code);
+  if (nestedCode) return nestedCode;
 
   const errorFields = readErrorFields(error);
   if (errorFields?.code) return errorFields.code;

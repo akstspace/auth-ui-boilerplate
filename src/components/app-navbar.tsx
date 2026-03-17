@@ -64,7 +64,7 @@ export function AppNavbar() {
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <Link href="/org" className="flex items-center gap-2.5">
-              <Lock className="size-5 text-foreground" />
+              <Lock className="size-5 text-foreground" aria-hidden="true" />
               <span className="hidden text-sm font-semibold text-foreground sm:inline">
                 Auth UI
               </span>
@@ -84,8 +84,9 @@ export function AppNavbar() {
                     ? "bg-muted text-foreground"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                 )}
+                aria-label="Platform Admin"
               >
-                <Shield className="size-4" />
+                <Shield className="size-4" aria-hidden="true" />
                 <span className="hidden sm:inline">Platform Admin</span>
               </Link>
             )}
@@ -96,8 +97,13 @@ export function AppNavbar() {
                 onClick={handleStopImpersonating}
                 disabled={isStoppingImpersonation}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-2 py-1.5 text-sm text-foreground transition-colors hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-60"
+                aria-label={
+                  isStoppingImpersonation
+                    ? "Restoring admin session"
+                    : "Stop impersonating"
+                }
               >
-                <Undo2 className="size-4" />
+                <Undo2 className="size-4" aria-hidden="true" />
                 <span className="hidden sm:inline">
                   {isStoppingImpersonation
                     ? "Restoring admin"
@@ -116,7 +122,7 @@ export function AppNavbar() {
               )}
               aria-label="Settings"
             >
-              <Settings className="size-4" />
+              <Settings className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">Settings</span>
             </Link>
 
@@ -126,7 +132,7 @@ export function AppNavbar() {
               className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
               aria-label="Sign out"
             >
-              <LogOut className="size-4" />
+              <LogOut className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">Sign out</span>
             </button>
 
