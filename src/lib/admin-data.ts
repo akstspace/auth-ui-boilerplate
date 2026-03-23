@@ -31,7 +31,6 @@ export interface AdminUserRecord {
 
 export interface AdminSessionRecord {
   id: string;
-  token?: string | null;
   expiresAt?: string | Date | null;
   createdAt?: string | Date | null;
   updatedAt?: string | Date | null;
@@ -40,6 +39,7 @@ export interface AdminSessionRecord {
   userId?: string | null;
   impersonatedBy?: string | null;
 }
+
 
 export interface AdminUsersResponse {
   users: AdminUserRecord[];
@@ -118,7 +118,6 @@ const parseSession = (value: unknown): AdminSessionRecord | null => {
 
   return {
     id: value.id,
-    token: typeof value.token === "string" ? value.token : null,
     expiresAt:
       typeof value.expiresAt === "string" || value.expiresAt instanceof Date
         ? value.expiresAt
@@ -157,11 +156,6 @@ export const formatDateTime = (value: string | Date | null | undefined) => {
   return date.toLocaleString();
 };
 
-export const truncateToken = (value: string | null | undefined) => {
-  if (!value) return "—";
-  if (value.length <= 12) return value;
-  return `${value.slice(0, 6)}...${value.slice(-4)}`;
-};
 
 const resolveFilterQuery = (filterKey: AdminFilterKey) => {
   switch (filterKey) {

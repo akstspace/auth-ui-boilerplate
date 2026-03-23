@@ -31,7 +31,6 @@ import {
     formatAdminError,
     formatDateTime,
     getAdminUserDetails,
-    truncateToken,
     type AdminSessionRecord,
     type AdminUserRecord,
 } from "@/lib/admin-data"
@@ -334,27 +333,6 @@ export default function AdminUserDetailPage() {
         })
     }
 
-    const requestRevokeSession = (sessionRecord: AdminSessionRecord) => {
-        setActionError("")
-        setActionSuccess("")
-        openConfirm({
-            title: "Revoke this session?",
-            description: "The selected device session will be invalidated immediately.",
-            actionLabel: "Revoke session",
-            onConfirm: async () => {
-                const result = await authClient.admin.revokeUserSession({
-                    sessionToken: sessionRecord.token ?? "",
-                })
-                if (result.error) {
-                    setActionError(formatAdminError(result.error, "Failed to revoke the session."))
-                    return
-                }
-                await loadPage()
-                setActionSuccess("Session revoked.")
-            },
-        })
-    }
-
     const requestDelete = () => {
         if (!user) return
         setActionError("")
@@ -640,19 +618,16 @@ export default function AdminUserDetailPage() {
                                             <Table className="min-w-[880px]">
                                                 <TableHeader>
                                                     <TableRow>
-                                                        <TableHead>Token</TableHead>
                                                         <TableHead>Created</TableHead>
                                                         <TableHead>Expires</TableHead>
                                                         <TableHead>IP</TableHead>
                                                         <TableHead>User agent</TableHead>
                                                         <TableHead>State</TableHead>
-                                                        <TableHead className="text-right">Action</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
                                                     {sessions.map((sessionRecord) => (
                                                         <TableRow key={sessionRecord.id}>
-                                                            <TableCell>{truncateToken(sessionRecord.token)}</TableCell>
                                                             <TableCell className="tabular-nums text-muted-foreground">
                                                                 {formatDateTime(sessionRecord.createdAt)}
                                                             </TableCell>
@@ -672,16 +647,6 @@ export default function AdminUserDetailPage() {
                                                                     <AdminStatusBadge label="Standard" />
                                                                 )}
                                                             </TableCell>
-                                                            <TableCell className="text-right">
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() => requestRevokeSession(sessionRecord)}
-                                                                    disabled={!sessionRecord.token}
-                                                                >
-                                                                    Revoke
-                                                                </Button>
-                                                            </TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
@@ -693,7 +658,6 @@ export default function AdminUserDetailPage() {
                                         {sessions.map((sessionRecord) => (
                                             <div key={sessionRecord.id} className="rounded-xl border border-border/60 p-4">
                                                 <div className="flex flex-wrap gap-2">
-                                                    <AdminStatusBadge label={truncateToken(sessionRecord.token)} />
                                                     {sessionRecord.impersonatedBy ? (
                                                         <AdminStatusBadge label="Impersonated" tone="warning" />
                                                     ) : null}
@@ -703,16 +667,6 @@ export default function AdminUserDetailPage() {
                                                     <p className="tabular-nums">Expires: {formatDateTime(sessionRecord.expiresAt)}</p>
                                                     <p>IP: {sessionRecord.ipAddress || "Unavailable"}</p>
                                                     <p className="text-pretty">User agent: {sessionRecord.userAgent || "Unavailable"}</p>
-                                                </div>
-                                                <div className="mt-3">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => requestRevokeSession(sessionRecord)}
-                                                        disabled={!sessionRecord.token}
-                                                    >
-                                                        Revoke session
-                                                    </Button>
                                                 </div>
                                             </div>
                                         ))}
