@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { ShieldCheck } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { getAuthFlowParams, resolveCallbackUrl } from "@/lib/auth-flow"
+import { pageEnterMotion } from "@/lib/motion"
 
 function TwoFactorContent() {
     const [code, setCode] = useState("")
@@ -77,8 +78,7 @@ function TwoFactorContent() {
     return (
         <div className="min-h-dvh bg-background flex items-center justify-center p-4 text-foreground">
             <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
+                {...pageEnterMotion}
                 className="w-full max-w-sm"
             >
                 <div className="mb-8 text-center">

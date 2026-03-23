@@ -73,7 +73,7 @@ export default function AdminCreateUserPage() {
     }
 
     return (
-        <div className="mx-auto max-w-4xl space-y-8">
+        <div className="space-y-8">
             <AdminPageHeader
                 title="Create user"
                 description="A focused flow for creating platform users without mixing it into the user index."
@@ -85,7 +85,7 @@ export default function AdminCreateUserPage() {
                 </div>
             ) : null}
 
-            <Card className="max-w-3xl border-border/50 bg-card">
+            <Card className="border-border/50 bg-card xl:max-w-4xl">
                 <CardHeader>
                     <CardTitle className="text-lg font-medium">New platform user</CardTitle>
                     <CardDescription className="text-sm leading-6 text-pretty">

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Mail } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { getAuthFlowParams, resolveCallbackUrl, withAuthFlow } from "@/lib/auth-flow"
+import { pageEnterMotion } from "@/lib/motion"
 
 function VerifyEmailContent() {
     const [loading, setLoading] = useState(false)
@@ -97,9 +98,7 @@ function VerifyEmailContent() {
     return (
         <div className="min-h-dvh bg-background text-foreground flex items-center justify-center p-4">
             <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
+                {...pageEnterMotion}
                 className="w-full max-w-sm"
             >
                 <div className="mb-8 text-center">

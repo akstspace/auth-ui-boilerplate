@@ -365,7 +365,7 @@ export default function AdminUserDetailPage() {
     }
 
     return (
-        <div className="mx-auto max-w-5xl space-y-8">
+        <div className="space-y-8">
             <AdminPageHeader
                 title={loading ? "Loading user..." : user?.name || "User detail"}
                 description="A single user view for profile edits, security changes, bans, impersonation, and sessions."

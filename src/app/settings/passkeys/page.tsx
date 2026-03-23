@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Fingerprint, Plus, Pencil, Trash2, Loader2, KeyRound } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
+import { cardEnterMotion } from "@/lib/motion"
 
 interface Passkey {
     id: string
@@ -124,8 +125,7 @@ export default function PasskeysSettingsPage() {
                 </div>
             ) : passkeys.length === 0 ? (
                 <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    {...cardEnterMotion}
                     className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-10 text-center"
                 >
                     <div className="flex justify-center mb-4">
@@ -148,9 +148,8 @@ export default function PasskeysSettingsPage() {
                         {passkeys.map((pk) => (
                             <motion.div
                                 key={pk.id}
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -8 }}
+                                {...cardEnterMotion}
+                                exit={{ opacity: 0, y: -6 }}
                                 className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-4"
                             >
                                 {deletingId === pk.id ? (

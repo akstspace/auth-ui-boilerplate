@@ -11,6 +11,7 @@ import { Building2, Plus, Loader2, Pencil, Trash2, Check, X } from "lucide-react
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { generateSlug } from "@/lib/utils"
 import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
+import { expandMotion } from "@/lib/motion"
 
 interface Organization {
     id: string
@@ -180,9 +181,7 @@ export default function OrganizationsPage() {
             <AnimatePresence>
                 {showCreate && (
                     <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
+                        {...expandMotion}
                         className="overflow-hidden"
                     >
                         <form onSubmit={handleCreate} className="space-y-4 rounded-xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm">

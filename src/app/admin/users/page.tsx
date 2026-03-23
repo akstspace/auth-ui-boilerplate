@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
     }
 
     return (
-        <div className="mx-auto max-w-5xl space-y-8">
+        <div className="space-y-8">
             <AdminPageHeader
                 title="Users"
                 description="Search the auth database, filter users, and jump into a dedicated detail page for each account."

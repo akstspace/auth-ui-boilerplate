@@ -6,13 +6,13 @@ import {
     Building2,
     Fingerprint,
     Users,
-    BookOpen,
     Loader2,
     ShieldCheck,
     UsersRound,
 } from "lucide-react"
 import Link from "next/link"
 import { isPlatformAdmin } from "@/lib/platform-admin"
+import { cardEnterMotion, pageEnterMotion } from "@/lib/motion"
 
 const isOrgManagerRole = (role: string | undefined) => {
     if (!role) return false
@@ -67,12 +67,6 @@ export default function OrgDashboard() {
             title: "Passkeys",
             desc: "Manage passwordless login and account security",
         },
-        {
-            href: "/guide",
-            icon: BookOpen,
-            title: "Integration Guide",
-            desc: "Backend setup and JWT docs",
-        },
         ...(canAccessPlatformAdmin
             ? [
                   {
@@ -88,16 +82,12 @@ export default function OrgDashboard() {
     return (
         <main className="mx-auto max-w-6xl px-4 sm:px-6">
             <section className="pb-10 pt-12">
-                <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                >
+                <motion.div {...pageEnterMotion}>
                     <h1 className="text-3xl font-bold tracking-tight text-balance text-foreground">
                         {activeOrg?.name || "Dashboard"}
                     </h1>
                     <p className="mt-2 max-w-2xl text-pretty text-muted-foreground">
-                        Welcome to your organization workspace. Manage your team, security settings, and integrations.
+                        Welcome to your organization workspace. Manage your team and security settings.
                     </p>
                 </motion.div>
             </section>
@@ -107,9 +97,8 @@ export default function OrgDashboard() {
                     {cards.map((card, i) => (
                         <motion.div
                             key={card.href}
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.06 }}
+                            {...cardEnterMotion}
+                            transition={{ ...cardEnterMotion.transition, delay: i * 0.04 }}
                         >
                             <Link
                                 href={card.href}

@@ -11,6 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { getAuthFlowParams, getInvitationCallbackUrl, resolveCallbackUrl, withAuthFlow } from "@/lib/auth-flow"
 import { buildAuthErrorUrl, getBannedMessage, isBannedError } from "@/lib/banned-user"
+import { expandMotion, pageEnterMotion } from "@/lib/motion"
 
 function SignUpContent() {
   const [emailLoading, setEmailLoading] = useState(false)
@@ -110,9 +111,7 @@ function SignUpContent() {
   return (
     <div className="min-h-dvh bg-background text-foreground flex items-center justify-center p-4">
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        {...pageEnterMotion}
         className="w-full max-w-sm"
       >
         <div className="mb-8">
@@ -163,8 +162,7 @@ function SignUpContent() {
           {showPasswordForm && (
             <motion.form
               id="signupPasswordFormPanel"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
+              {...expandMotion}
               className="mt-4 space-y-3 overflow-hidden"
               onSubmit={handleEmailSignUp}
             >

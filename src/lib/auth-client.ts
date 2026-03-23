@@ -36,7 +36,7 @@ export const authClient = createAuthClient({
         console.warn("[Auth] Rate limited — please try again shortly.");
         return;
       }
-      console.log(
+      console.error(
         "[Auth] Request failed:",
         getAuthErrorMessage(ctx.error, "Unexpected authentication error."),
       );

@@ -11,6 +11,7 @@ import { Lock, Fingerprint, ChevronDown } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { getAuthFlowParams, resolveCallbackUrl, withAuthFlow } from "@/lib/auth-flow"
 import { buildAuthErrorUrl, getBannedMessage, isBannedError } from "@/lib/banned-user"
+import { expandMotion, pageEnterMotion } from "@/lib/motion"
 
 function LoginContent() {
   const [passkeyLoading, setPasskeyLoading] = useState(false)
@@ -204,9 +205,7 @@ function LoginContent() {
   return (
     <div className="min-h-dvh bg-background text-foreground flex items-center justify-center p-4">
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        {...pageEnterMotion}
         className="w-full max-w-sm"
       >
         <div className="mb-8">
@@ -279,8 +278,7 @@ function LoginContent() {
           {showPasswordForm && (
             <motion.form
               id="loginPasswordFormPanel"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
+              {...expandMotion}
               className="mt-4 space-y-3 overflow-hidden"
               onSubmit={handleEmailSignIn}
             >

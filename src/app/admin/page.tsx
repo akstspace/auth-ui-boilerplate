@@ -75,7 +75,7 @@ export default function AdminPage() {
     }, [])
 
     return (
-        <div className="mx-auto max-w-5xl space-y-8">
+        <div className="space-y-8">
             <AdminPageHeader
                 title="Overview"
                 description="Monitor account health, review recent users, and jump quickly into the admin actions you need most."

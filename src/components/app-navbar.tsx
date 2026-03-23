@@ -3,16 +3,26 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Lock, LogOut, Settings, Shield, Undo2 } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Lock, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Settings, Shield, Undo2 } from "lucide-react";
 import { OrgSwitcher } from "@/components/org-switcher";
 import { TeamSwitcher } from "@/components/team-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { authClient } from "@/lib/auth-client";
 import { getAuthErrorMessage } from "@/lib/auth-error";
 import { cn } from "@/lib/utils";
 import { isImpersonating, isPlatformAdmin } from "@/lib/platform-admin";
 
-export function AppNavbar() {
+export function AppNavbar({
+  hideNavigationActions = false,
+  isSidebarOpen = false,
+  onToggleSidebar,
+  sidebarLabel = "Sidebar",
+}: {
+  hideNavigationActions?: boolean;
+  isSidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
+  sidebarLabel?: string;
+}) {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
   const [adminError, setAdminError] = React.useState("");
@@ -22,7 +32,7 @@ export function AppNavbar() {
   const handleSignOut = async () => {
     const { error } = await authClient.signOut();
     if (error) {
-      console.log(
+      console.error(
         "Sign out failed:",
         getAuthErrorMessage(error, "Sign out failed."),
       );
@@ -63,6 +73,22 @@ export function AppNavbar() {
       <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
+            {onToggleSidebar ? (
+              <button
+                type="button"
+                onClick={onToggleSidebar}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+                aria-label={`${isSidebarOpen ? "Close" : "Open"} ${sidebarLabel}`}
+                aria-pressed={isSidebarOpen}
+              >
+                <Menu className="size-4 lg:hidden" aria-hidden="true" />
+                {isSidebarOpen ? (
+                  <PanelLeftClose className="hidden size-4 lg:block" aria-hidden="true" />
+                ) : (
+                  <PanelLeftOpen className="hidden size-4 lg:block" aria-hidden="true" />
+                )}
+              </button>
+            ) : null}
             <Link href="/org" className="flex items-center gap-2.5">
               <Lock className="size-5 text-foreground" aria-hidden="true" />
               <span className="hidden text-sm font-semibold text-foreground sm:inline">
@@ -74,7 +100,8 @@ export function AppNavbar() {
             <TeamSwitcher />
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          {!hideNavigationActions ? (
+            <div className="flex items-center gap-2 sm:gap-3">
             {canAccessAdmin && (
               <Link
                 href="/admin"
@@ -138,6 +165,27 @@ export function AppNavbar() {
 
             <ThemeToggle />
           </div>
+          ) : (
+            <div className="flex items-center gap-2 sm:gap-3">
+              {impersonating ? (
+                <span className="hidden rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300 sm:inline-flex">
+                  Impersonating
+                </span>
+              ) : null}
+
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+                aria-label="Sign out"
+              >
+                <LogOut className="size-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Sign out</span>
+              </button>
+
+              <ThemeToggle />
+            </div>
+          )}
         </div>
       </nav>
 

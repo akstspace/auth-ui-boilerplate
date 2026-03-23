@@ -7,6 +7,7 @@ import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { CheckCircle2, XCircle } from "lucide-react"
 import { Suspense } from "react"
+import { cardEnterMotion, pageEnterMotion } from "@/lib/motion"
 
 function EmailVerifiedContent() {
     const searchParams = useSearchParams()
@@ -16,17 +17,14 @@ function EmailVerifiedContent() {
     return (
         <div className="min-h-dvh bg-background text-foreground flex items-center justify-center p-4">
             <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
+                {...pageEnterMotion}
                 className="w-full max-w-sm"
             >
                 <div className="mb-8 text-center">
                     <div className="flex justify-center mb-4">
                         <motion.div
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.15, type: "spring", stiffness: 200, damping: 12 }}
+                            {...cardEnterMotion}
+                            transition={{ ...cardEnterMotion.transition, delay: 0.06 }}
                             className={`flex items-center justify-center size-12 rounded-full ${isSuccess ? "bg-emerald-500/10" : "bg-destructive/10"
                                 }`}
                         >

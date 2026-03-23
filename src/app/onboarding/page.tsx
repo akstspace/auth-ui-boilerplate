@@ -10,6 +10,7 @@ import { Building2 } from "lucide-react"
 import { getAuthErrorMessage } from "@/lib/auth-error"
 import { generateSlug } from "@/lib/utils"
 import { setActiveOrganizationWithTeam } from "@/lib/organization-context"
+import { pageEnterMotion } from "@/lib/motion"
 
 export default function OnboardingPage() {
     const [name, setName] = useState("")
@@ -51,9 +52,7 @@ export default function OnboardingPage() {
     return (
         <div className="min-h-dvh bg-background text-foreground flex items-center justify-center p-4">
             <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
+                {...pageEnterMotion}
                 className="w-full max-w-sm"
             >
                 <div className="mb-8">

@@ -13,7 +13,12 @@ import {
 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 import { LoginRequired } from "@/components/login-required"
-import { AppNavbar } from "@/components/app-navbar"
+import {
+    AppShellLayout,
+    AppShellUtilitySection,
+    AppSidebarSection,
+} from "@/components/app-shell"
+import { pageEnterMotion } from "@/lib/motion"
 
 interface NavItem {
     href: string
@@ -46,62 +51,72 @@ export default function OrgSettingsLayout({ children }: { children: React.ReactN
     const { data: activeMemberRole } = authClient.useActiveMemberRole()
     const canManageOrg = isOrgManagerRole(activeMemberRole?.role)
 
-    const renderNavItem = (item: NavItem) => {
+    const getNavItemClassName = (item: NavItem) => {
         const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
-        return (
-            <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
-            >
-                <item.icon className="size-4" />
-                {item.label}
-            </Link>
-        )
+        return `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive
+            ? "bg-muted text-foreground"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            }`
     }
 
     return (
         <LoginRequired>
             <div className="min-h-dvh bg-background text-foreground transition-colors duration-200">
-                <AppNavbar />
+                <AppShellLayout
+                    contentClassName="max-w-5xl"
+                    sidebar={({ closeSidebar }) => (
+                        <motion.div
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={pageEnterMotion.transition}
+                            className="space-y-6"
+                        >
+                            {canManageOrg && (
+                                <AppSidebarSection title="Organization">
+                                    <nav className="space-y-1">
+                                        {ORG_NAV_ITEMS.map((item) => (
+                                            <Link
+                                                key={item.href}
+                                                href={item.href}
+                                                onClick={closeSidebar}
+                                                className={getNavItemClassName(item)}
+                                            >
+                                                <item.icon className="size-4" />
+                                                {item.label}
+                                            </Link>
+                                        ))}
+                                    </nav>
+                                </AppSidebarSection>
+                            )}
 
-                <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-                    <div className="flex flex-col gap-8 md:flex-row">
-                    <motion.aside
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="shrink-0 md:w-56"
-                    >
-                        {canManageOrg && (
-                            <>
-                                <h2 className="mb-3 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">Organization</h2>
+                            <AppSidebarSection title="Account">
                                 <nav className="space-y-1">
-                                    {ORG_NAV_ITEMS.map(renderNavItem)}
+                                    {ACCOUNT_NAV_ITEMS.map((item) => (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            onClick={closeSidebar}
+                                            className={getNavItemClassName(item)}
+                                        >
+                                            <item.icon className="size-4" />
+                                            {item.label}
+                                        </Link>
+                                    ))}
                                 </nav>
-                            </>
-                        )}
+                            </AppSidebarSection>
 
-                        <h2 className="mb-3 mt-6 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">Account</h2>
-                        <nav className="space-y-1">
-                            {ACCOUNT_NAV_ITEMS.map(renderNavItem)}
-                        </nav>
-                    </motion.aside>
-
-                    <motion.main
+                            <AppShellUtilitySection closeSidebar={closeSidebar} />
+                        </motion.div>
+                    )}
+                >
+                    <motion.div
                         key={pathname}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
-                        className="min-w-0 flex-1"
+                        {...pageEnterMotion}
+                        className="min-w-0"
                     >
                         {children}
-                    </motion.main>
-                </div>
-                </div>
+                    </motion.div>
+                </AppShellLayout>
             </div>
         </LoginRequired>
     )

@@ -5,7 +5,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, Plus, Users } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-import { AppNavbar } from "@/components/app-navbar";
+import {
+  AppShellLayout,
+  AppShellUtilitySection,
+  AppSidebarSection,
+} from "@/components/app-shell";
 import { LoginRequired } from "@/components/login-required";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,9 +56,38 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <LoginRequired>
       <div className="min-h-dvh bg-background text-foreground">
-        <AppNavbar />
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
-          {!canAccessAdmin ? (
+        {!canAccessAdmin ? (
+          <AppShellLayout
+            sidebar={({ closeSidebar }) => (
+              <div className="space-y-6">
+                <AppSidebarSection title="Workspace">
+                  <nav className="space-y-1">
+                    {ADMIN_NAV_ITEMS.map((item) => {
+                      const isActive = isAdminNavItemActive(pathname, item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={closeSidebar}
+                          className={cn(
+                            "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                            isActive
+                              ? "bg-muted text-foreground"
+                              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                          )}
+                        >
+                          <item.icon className="size-4" />
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </AppSidebarSection>
+
+                <AppShellUtilitySection closeSidebar={closeSidebar} />
+              </div>
+            )}
+          >
             <Card className="mx-auto max-w-2xl border-border/60 bg-card/70">
               <CardHeader>
                 <CardTitle>Platform Admin</CardTitle>
@@ -64,37 +97,42 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </CardDescription>
               </CardHeader>
             </Card>
-          ) : (
-            <div className="flex flex-col gap-8 lg:flex-row">
-              <aside className="shrink-0 lg:sticky lg:top-20 lg:w-56 lg:self-start">
-                <h2 className="mb-3 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Platform admin
-                </h2>
-                <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-1 lg:space-y-1 lg:gap-0">
-                  {ADMIN_NAV_ITEMS.map((item) => {
-                    const isActive = isAdminNavItemActive(pathname, item.href);
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                          "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                          isActive
-                            ? "bg-muted text-foreground"
-                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
-                        )}
-                      >
-                        <item.icon className="size-4" />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </nav>
-              </aside>
-              <main className="min-w-0 flex-1">{children}</main>
-            </div>
-          )}
-        </div>
+          </AppShellLayout>
+        ) : (
+          <AppShellLayout
+            sidebar={({ closeSidebar }) => (
+              <div className="space-y-6">
+                <AppSidebarSection title="Platform admin">
+                  <nav className="space-y-1">
+                    {ADMIN_NAV_ITEMS.map((item) => {
+                      const isActive = isAdminNavItemActive(pathname, item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={closeSidebar}
+                          className={cn(
+                            "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                            isActive
+                              ? "bg-muted text-foreground"
+                              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                          )}
+                        >
+                          <item.icon className="size-4" />
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </AppSidebarSection>
+
+                <AppShellUtilitySection closeSidebar={closeSidebar} />
+              </div>
+            )}
+          >
+            {children}
+          </AppShellLayout>
+        )}
       </div>
     </LoginRequired>
   );
