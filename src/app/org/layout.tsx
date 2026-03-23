@@ -22,8 +22,7 @@ export default function OrgLayout({ children }: { children: React.ReactNode }) {
             <div className="min-h-dvh bg-background text-foreground transition-colors duration-200">
                 <AppShellLayout
                     sidebar={({ closeSidebar }) => (
-                        <div className="space-y-6">
-                            <div className="space-y-3">
+                        <div className="space-y-3">
                                 <div className="rounded-xl border border-border/60 bg-card/60 px-3 py-3">
                                     <p className="truncate text-sm font-medium text-foreground">
                                         {session?.user?.name || "Your account"}
@@ -65,7 +64,6 @@ export default function OrgLayout({ children }: { children: React.ReactNode }) {
                                         </Link>
                                     ) : null}
                                 </nav>
-                            </div>
                         </div>
                     )}
                 >

@@ -31,7 +31,16 @@ export function AppShellLayout({
 
   React.useEffect(() => {
     const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
-    setIsSidebarOpen(mediaQuery.matches);
+    const handleMediaQueryChange = () => {
+      setIsSidebarOpen(mediaQuery.matches);
+    };
+
+    handleMediaQueryChange();
+    mediaQuery.addEventListener("change", handleMediaQueryChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleMediaQueryChange);
+    };
   }, []);
 
   const closeSidebar = React.useCallback(() => {
@@ -81,7 +90,7 @@ export function AppShellLayout({
 
       <aside
         className={cn(
-          "fixed inset-y-14 left-0 z-50 w-80 max-w-[85vw] border-r border-border/60 bg-background px-4 py-5 shadow-xl transition-transform duration-200 ease-out lg:hidden",
+          "fixed top-14 bottom-0 left-0 z-50 w-80 max-w-[85vw] border-r border-border/60 bg-background px-4 py-5 shadow-xl transition-transform duration-200 ease-out lg:hidden",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
         aria-label="Navigation"
