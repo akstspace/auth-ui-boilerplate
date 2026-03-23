@@ -1,6 +1,6 @@
 "use client"
 
-import { type FormEvent, useEffect, useState } from "react"
+import { type FormEvent, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft, Ban, CircleOff, Copy, KeyRound, Loader2, Pencil, Shield, Trash2, Undo2, UserCog } from "lucide-react"
@@ -102,12 +102,15 @@ export default function AdminUserDetailPage() {
     const [suspensionDialogOpen, setSuspensionDialogOpen] = useState(false)
 
     const isSelf = user?.id === currentUserId
+    const staleRef = useRef(false)
 
-    const loadPage = async () => {
+    const loadPage = async (options?: { isStale?: () => boolean }) => {
         setLoading(true)
         setError("")
 
         const result = await getAdminUserDetails(userId)
+        if (options?.isStale?.()) return
+
         const resolvedUser = result.data?.user ?? null
         if (!resolvedUser) {
             setError(result.error || "Failed to load the user.")
@@ -136,7 +139,9 @@ export default function AdminUserDetailPage() {
     }
 
     useEffect(() => {
-        void loadPage()
+        staleRef.current = false
+        void loadPage({ isStale: () => staleRef.current })
+        return () => { staleRef.current = true }
     }, [userId])
 
     useEffect(() => {
@@ -174,11 +179,11 @@ export default function AdminUserDetailPage() {
             const result = await authClient.admin.updateUser({
                 userId: user.id,
                 data: {
+                    ...parsed.value,
                     name: profileName.trim(),
                     email: profileEmail.trim().toLowerCase(),
                     image: profileImage.trim() || null,
                     emailVerified: profileEmailVerified,
-                    ...parsed.value,
                 },
             })
 
@@ -199,6 +204,21 @@ export default function AdminUserDetailPage() {
 
     const handleSetRole = async () => {
         if (!user) return
+
+        const trimmed = roleInput.trim()
+        if (!trimmed) {
+            setActionError("Role must not be empty.")
+            setActionSuccess("")
+            return
+        }
+
+        const tokens = trimmed.split(",").map((t) => t.trim())
+        if (tokens.some((t) => !t)) {
+            setActionError("Role list contains empty entries. Remove extra commas and try again.")
+            setActionSuccess("")
+            return
+        }
+
         setSavingRole(true)
         setActionError("")
         setActionSuccess("")
@@ -206,7 +226,7 @@ export default function AdminUserDetailPage() {
         try {
             const result = await authClient.admin.setRole({
                 userId: user.id,
-                role: toRolePayload(roleInput),
+                role: toRolePayload(trimmed) as never,
             })
 
             if (result.error) {
@@ -614,7 +634,7 @@ export default function AdminUserDetailPage() {
                             ) : (
                                 <>
                                     <div className="hidden md:block">
-                                        <div className="overflow-hidden rounded-xl border border-border/60">
+                                        <div className="overflow-x-auto rounded-xl border border-border/60">
                                             <Table className="min-w-[880px]">
                                                 <TableHeader>
                                                     <TableRow>
@@ -712,23 +732,23 @@ export default function AdminUserDetailPage() {
                     <form onSubmit={handleSaveProfile} className="space-y-4">
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Name</label>
-                                <Input value={profileName} onChange={(event) => setProfileName(event.target.value)} required />
+                                <label htmlFor="profileName" className="text-sm font-medium">Name</label>
+                                <Input id="profileName" value={profileName} onChange={(event) => setProfileName(event.target.value)} required />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Email</label>
-                                <Input type="email" value={profileEmail} onChange={(event) => setProfileEmail(event.target.value)} required />
+                                <label htmlFor="profileEmail" className="text-sm font-medium">Email</label>
+                                <Input id="profileEmail" type="email" value={profileEmail} onChange={(event) => setProfileEmail(event.target.value)} required />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Image URL</label>
-                            <Input value={profileImage} onChange={(event) => setProfileImage(event.target.value)} placeholder="https://example.com/avatar.png" />
+                            <label htmlFor="profileImage" className="text-sm font-medium">Image URL</label>
+                            <Input id="profileImage" value={profileImage} onChange={(event) => setProfileImage(event.target.value)} placeholder="https://example.com/avatar.png" />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Extra JSON patch</label>
-                            <Textarea value={profilePatch} onChange={(event) => setProfilePatch(event.target.value)} placeholder='{"department":"Operations"}' />
+                            <label htmlFor="profilePatch" className="text-sm font-medium">Extra JSON patch</label>
+                            <Textarea id="profilePatch" value={profilePatch} onChange={(event) => setProfilePatch(event.target.value)} placeholder='{"department":"Operations"}' />
                         </div>
 
                         <label className="flex items-start gap-3 rounded-lg border border-border/60 bg-muted/20 p-3 text-sm">
@@ -759,7 +779,8 @@ export default function AdminUserDetailPage() {
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
-                        <Input value={roleInput} onChange={(event) => setRoleInput(event.target.value)} placeholder="admin,user" />
+                        <label htmlFor="roleInput" className="sr-only">Roles</label>
+                        <Input id="roleInput" value={roleInput} onChange={(event) => setRoleInput(event.target.value)} placeholder="admin,user" />
                         <DialogFooter showCloseButton>
                             <Button type="button" size="sm" onClick={() => void handleSetRole()} disabled={savingRole}>
                                 {savingRole ? "Saving..." : "Apply roles"}
@@ -778,7 +799,8 @@ export default function AdminUserDetailPage() {
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSetPassword} className="space-y-4">
-                        <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+                        <label htmlFor="profilePassword" className="sr-only">New password</label>
+                        <Input id="profilePassword" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
                         <DialogFooter showCloseButton>
                             <Button type="submit" size="sm" disabled={savingPassword}>
                                 <KeyRound className="size-4" />
@@ -799,16 +821,17 @@ export default function AdminUserDetailPage() {
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Ban reason</label>
+                            <label htmlFor="banReason" className="text-sm font-medium">Ban reason</label>
                             <Textarea
+                                id="banReason"
                                 value={banReason}
                                 onChange={(event) => setBanReason(event.target.value)}
                                 placeholder="Explain why this account is suspended."
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Ban expiry in seconds</label>
-                            <Input type="number" min="1" value={banExpiresIn} onChange={(event) => setBanExpiresIn(event.target.value)} placeholder="604800" />
+                            <label htmlFor="banExpiresIn" className="text-sm font-medium">Ban expiry in seconds</label>
+                            <Input id="banExpiresIn" type="number" min="1" value={banExpiresIn} onChange={(event) => setBanExpiresIn(event.target.value)} placeholder="604800" />
                         </div>
                         <div className="rounded-lg border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
                             {user?.banned ? (

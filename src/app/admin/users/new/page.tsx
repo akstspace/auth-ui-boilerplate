@@ -53,7 +53,7 @@ export default function AdminCreateUserPage() {
             const result = await authClient.admin.createUser({
                 name: name.trim(),
                 email: email.trim().toLowerCase(),
-                role: toRolePayload(roles),
+                role: toRolePayload(roles) as never,
                 ...(createCredentialAccount ? { password } : {}),
                 ...(Object.keys(parsedJson.value).length > 0 ? { data: parsedJson.value } : {}),
             })

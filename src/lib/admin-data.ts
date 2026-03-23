@@ -226,15 +226,16 @@ export const listAdminUsers = async (
       };
     }
 
+    const raw = payload as Record<string, unknown>;
     return {
       data: {
         users: payload.users
           .map((item) => parseUser(item))
           .filter((item): item is AdminUserRecord => Boolean(item)),
         total: typeof payload.total === "number" ? payload.total : 0,
-        limit: typeof payload.limit === "number" ? payload.limit : query.limit,
+        limit: typeof raw.limit === "number" ? raw.limit : query.limit,
         offset:
-          typeof payload.offset === "number" ? payload.offset : query.offset,
+          typeof raw.offset === "number" ? raw.offset : query.offset,
       },
       error: null,
     };
@@ -281,6 +282,28 @@ export const getAdminStats = async (): Promise<{
         },
       }),
     ]);
+
+    const results = [
+      { label: "total users", result: allUsers },
+      { label: "admins", result: admins },
+      { label: "banned users", result: banned },
+      { label: "verified users", result: verified },
+    ];
+
+    for (const { label, result } of results) {
+      if (result.error) {
+        return {
+          data: null,
+          error: formatAdminError(result.error, `Failed to load ${label}.`),
+        };
+      }
+      if (!result.data) {
+        return {
+          data: null,
+          error: `Failed to load ${label}: no data returned.`,
+        };
+      }
+    }
 
     const readTotal = (value: unknown) =>
       isRecord(value) && typeof value.total === "number" ? value.total : 0;
