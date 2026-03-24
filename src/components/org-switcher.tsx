@@ -29,14 +29,14 @@ export function OrgSwitcher() {
         try {
             const { data, error } = await authClient.organization.list()
             if (error) {
-                console.log("Failed to load organizations:", error)
+                console.error("Failed to load organizations:", error)
                 setFetchError(true)
                 return
             }
             if (data) setOrgs(data as unknown as Organization[])
             setFetchError(false)
         } catch (err) {
-            console.log("Failed to load organizations:", err)
+            console.error("Failed to load organizations:", err)
             setFetchError(true)
         } finally {
             setLoading(false)
@@ -63,7 +63,7 @@ export function OrgSwitcher() {
         try {
             const { error } = await setActiveOrganizationWithTeam(orgId)
             if (error) {
-                console.log(
+                console.error(
                     "Failed to switch organization:",
                     getAuthErrorMessage(error, "Could not switch organization."),
                 )
@@ -72,7 +72,7 @@ export function OrgSwitcher() {
             setOpen(false)
             router.push("/org")
         } catch (err) {
-            console.log(
+            console.error(
                 "Failed to switch organization:",
                 getAuthErrorMessage(err, "Could not switch organization."),
             )

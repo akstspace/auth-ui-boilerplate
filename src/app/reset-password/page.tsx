@@ -11,6 +11,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { getAuthErrorMessage } from "@/lib/auth-error"
+import { pageEnterMotion } from "@/lib/motion"
 
 function ResetPasswordContent() {
     const [password, setPassword] = useState("")
@@ -27,8 +28,7 @@ function ResetPasswordContent() {
         return (
             <div className="min-h-dvh bg-background flex items-center justify-center p-4 text-foreground">
                 <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    {...pageEnterMotion}
                     className="w-full max-w-sm"
                 >
                     <div className="mb-8 text-center">
@@ -76,8 +76,7 @@ function ResetPasswordContent() {
     return (
         <div className="min-h-dvh bg-background flex items-center justify-center p-4 text-foreground">
             <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
+                {...pageEnterMotion}
                 className="w-full max-w-sm"
             >
                 <div className="mb-8 text-center">

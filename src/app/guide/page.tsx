@@ -4,6 +4,7 @@ import { useState } from "react"
 import { motion } from "motion/react"
 import { Shield, Key, Clock, Tag, Copy, Check, Lock, Fingerprint, Database, Globe, Terminal, FolderTree, Blocks, Sparkles } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LoginRequired } from "@/components/login-required"
 
 import Link from "next/link"
 
@@ -301,13 +302,14 @@ function CodeBlock({ code }: { code: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// Guide Page (public, no auth required)
+// Guide Page
 // ---------------------------------------------------------------------------
 export default function GuidePage() {
     const [activeTab, setActiveTab] = useState<Tab>("golang")
     const current = codeMap[activeTab]
 
     return (
+        <LoginRequired>
         <div className="min-h-dvh bg-background text-foreground">
             {/* Nav */}
             <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
@@ -617,5 +619,6 @@ export default function GuidePage() {
                 </div>
             </footer>
         </div>
+        </LoginRequired>
     )
 }

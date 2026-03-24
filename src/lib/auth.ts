@@ -8,6 +8,7 @@ import {
   lastLoginMethod,
   organization,
   twoFactor,
+  admin,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
 import { sendInvitationEmail, sendVerificationEmail, sendPasswordResetEmail, send2FAEmail } from "@/lib/email";
@@ -89,6 +90,10 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
+
+  onAPIError: {
+    errorURL: "/auth/error",
+  },
 
   // ── Account Linking ───────────────────────────────────────────
   account: {
@@ -204,23 +209,28 @@ export const auth = betterAuth({
         sendOTP: send2FAEmail,
       },
     }),
+
+    admin({
+      bannedUserMessage:
+        "Your account has been suspended. Contact a platform administrator if you think this is a mistake.",
+    }),
   ],
 
   // ── Rate Limiting ─────────────────────────────────────────────
   rateLimit: {
     enabled: true,
     window: 60,
-    max: 100,
+    max: 300,
     customRules: {
-      "/sign-in/social": { window: 10, max: 5 },
-      "/sign-in/passkey": { window: 10, max: 5 },
-      "/sign-in/email": { window: 10, max: 5 },
-      "/sign-up/email": { window: 10, max: 5 },
-      "/two-factor/send-otp": { window: 60, max: 3 },
-      "/two-factor/verify-totp": { window: 10, max: 5 },
-      "/two-factor/verify-otp": { window: 10, max: 5 },
-      "/forget-password": { window: 60, max: 3 },
-      "/reset-password": { window: 60, max: 3 },
+      "/sign-in/social": { window: 60, max: 20 },
+      "/sign-in/passkey": { window: 60, max: 20 },
+      "/sign-in/email": { window: 60, max: 20 },
+      "/sign-up/email": { window: 60, max: 12 },
+      "/two-factor/send-otp": { window: 300, max: 10 },
+      "/two-factor/verify-totp": { window: 60, max: 20 },
+      "/two-factor/verify-otp": { window: 60, max: 20 },
+      "/forget-password": { window: 300, max: 6 },
+      "/reset-password": { window: 300, max: 10 },
     },
   },
 

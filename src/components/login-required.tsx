@@ -4,6 +4,7 @@ import { useEffect, Suspense } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { withAuthFlow } from "@/lib/auth-flow"
+import { buildAuthErrorUrl } from "@/lib/banned-user"
 
 function LoginRequiredInner({ children }: { children: React.ReactNode }) {
     const { data: session, isPending } = authClient.useSession()
@@ -14,7 +15,15 @@ function LoginRequiredInner({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (!isPending) {
-            if (!session?.user) {
+            if (searchParams.get("error") === "banned") {
+                router.replace(
+                    buildAuthErrorUrl({
+                        error: "banned",
+                        errorDescription: searchParams.get("error_description"),
+                        email: searchParams.get("email"),
+                    }),
+                )
+            } else if (!session?.user) {
                 router.replace(withAuthFlow("/login", { callbackUrl }))
             } else if (!session.user.emailVerified) {
                 router.replace(
@@ -25,9 +34,14 @@ function LoginRequiredInner({ children }: { children: React.ReactNode }) {
                 )
             }
         }
-    }, [callbackUrl, isPending, router, session])
+    }, [callbackUrl, isPending, router, searchParams, session])
 
-    if (isPending || !session?.user || !session?.user?.emailVerified) {
+    if (
+        isPending ||
+        searchParams.get("error") === "banned" ||
+        !session?.user ||
+        !session?.user?.emailVerified
+    ) {
         return null
     }
 
